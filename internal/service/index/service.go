@@ -8,6 +8,8 @@ package index
 import (
 	"context"
 
+	"github.com/gin-gonic/gin"
+
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/internal/dal/repository"
 	s "github.com/ch3nnn/webstack-go/internal/service"
@@ -17,12 +19,14 @@ var _ Service = (*service)(nil)
 
 type Service interface {
 	i()
-	Index(ctx context.Context) (*v1.IndexResponseData, error)
+	Index(ctx context.Context) (*v1.IndexResp, error)
+	About(ctx *gin.Context) (*v1.AboutResp, error)
 }
 
 type service struct {
 	siteRepo     repository.IStSiteDao
 	categoryRepo repository.IStCategoryDao
+	configRepo   repository.ISysConfigDao
 	*s.Service
 }
 
@@ -31,6 +35,7 @@ func NewService(s *s.Service) Service {
 		Service:      s,
 		siteRepo:     repository.NewStSiteDao(),
 		categoryRepo: repository.NewStCategoryDao(),
+		configRepo:   repository.NewSysConfigDao(),
 	}
 }
 
