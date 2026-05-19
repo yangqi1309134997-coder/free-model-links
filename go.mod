@@ -1,7 +1,8 @@
 module github.com/ch3nnn/webstack-go
 
-go 1.22
-toolchain go1.24.1
+go 1.23.0
+
+toolchain go1.24.2
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
@@ -14,6 +15,7 @@ require (
 	github.com/glebarez/sqlite v1.11.0
 	github.com/gocolly/colly v1.2.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
+	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
 	github.com/mat/besticon v0.0.0-20230308222644-ee1fe52e97c1
 	github.com/pkg/errors v0.9.1
@@ -76,7 +78,6 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect

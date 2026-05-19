@@ -58,7 +58,7 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 	categoryHandler := category2.NewHandler(handlerHandler, categoryService)
 	configService := config.NewService(serviceService, iSysConfigDao)
 	configHandler := config2.NewHandler(handlerHandler, configService)
-	httpServer := server.NewHTTPServer(engine, logger, viperViper, jwtJWT, dashboardHandler, indexHandler, userHandler, siteHandler, categoryHandler, configHandler)
+	httpServer := server.NewHTTPServer(engine, logger, viperViper, jwtJWT, db, dashboardHandler, indexHandler, userHandler, siteHandler, categoryHandler, configHandler)
 	appApp := newApp(httpServer)
 	return appApp, func() {
 	}, nil
