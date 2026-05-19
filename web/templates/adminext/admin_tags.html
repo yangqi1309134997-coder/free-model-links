@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
+</head>
+<body>
+<div class="container-fluid p-t-15">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-toolbar d-flex flex-column flex-md-row justify-content-between">
+                    <div class="toolbar-btn-action">
+                        <button class="btn btn-primary" onclick="showAdd()"><i class="mdi mdi-plus"></i> 新增标签</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead><tr><th>ID</th><th>名称</th><th>颜色</th><th>排序</th><th style="text-align:center">操作</th></tr></thead>
+                            <tbody class="tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/assets/static/admin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
+<script type="text/javascript" src="/assets/static/plugin/jquery-confirm/jquery-confirm.min.js"></script>
+<script>
+function loadTags(){
+    AjaxForm('GET','/api/admin/tags','',function(){},function(d){
+        var html='';
+        (d.list||[]).forEach(function(t){
+            html+='<tr><td>'+t.id+'</td><td><span style="color:'+t.color+'">'+t.name+'</span></td>';
+            html+='<td><span style="background:'+t.color+';padding:2px 10px;border-radius:10px;color:#fff;font-size:12px">'+t.color+'</span></td>';
+            html+='<td>'+t.sort+'</td>';
+            html+='<td style="text-align:center">';
+            html+='<button class="btn btn-sm btn-warning m-r-5" onclick="editTag('+t.id+')">编辑</button>';
+            html+='<button class="btn btn-sm btn-danger" onclick="deleteTag('+t.id+')">删除</button>';
+            html+='</td></tr>';
+        });
+        $('.tbody').html(html||'<tr><td colspan="5" class="text-center">暂无数据</td></tr>');
+    },function(e){AjaxError(e);});
+}
+function showAdd(){
+    $.confirm({title:'新增标签',content:'<div class="form-group"><label>名称</label><input class="form-control" id="t-name" required></div><div class="form-group"><label>颜色</label><input class="form-control" id="t-color" type="color" value="#10b981"></div><div class="form-group"><label>排序</label><input class="form-control" id="t-sort" type="number" value="0"></div>',
+    buttons:{confirm:function(){
+        var data={name:$('#t-name').val(),color:$('#t-color').val(),sort:parseInt($('#t-sort').val())||0,is_used:true};
+        AjaxPostJson('/api/admin/tags',data,function(){},function(d){$.alert({title:'成功',type:'green',content:'已添加'});loadTags();},function(e){AjaxError(e);});
+    },cancel:function(){}}});
+}
+function editTag(id){
+    $.confirm({title:'编辑标签',content:'<div class="form-group"><label>名称</label><input class="form-control" id="t-name" required></div><div class="form-group"><label>颜色</label><input class="form-control" id="t-color" type="color"></div><div class="form-group"><label>排序</label><input class="form-control" id="t-sort" type="number"></div>',
+    buttons:{confirm:function(){
+        var data={name:$('#t-name').val(),color:$('#t-color').val(),sort:parseInt($('#t-sort').val())||0};
+        AjaxPostJson('/api/admin/tags/'+id,data,function(){},function(d){$.alert({title:'成功',type:'green',content:'已更新'});loadTags();},function(e){AjaxError(e);});
+    },cancel:function(){}}});
+}
+function deleteTag(id){
+    $.confirm({title:'确认',content:'确定删除?',type:'red',buttons:{confirm:function(){
+        AjaxForm('DELETE','/api/admin/tags/'+id,'',function(){},function(d){$.alert({title:'成功',type:'green',content:'已删除'});loadTags();},function(e){AjaxError(e);});
+    },cancel:function(){}}});
+}
+$(function(){loadTags();});
+</script>
+</body>
+</html>

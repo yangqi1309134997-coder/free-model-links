@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
+</head>
+<body>
+<div class="container-fluid p-t-15">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-toolbar d-flex flex-column flex-md-row justify-content-between">
+                    <div class="toolbar-btn-action">
+                        <select class="form-control" id="filter-status" style="width:150px;display:inline-block">
+                            <option value="">全部状态</option>
+                            <option value="pending">待审核</option>
+                            <option value="approved">已通过</option>
+                            <option value="rejected">已拒绝</option>
+                        </select>
+                        <select class="form-control" id="filter-site" style="width:150px;display:inline-block">
+                            <option value="">全部网站</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="reviewTable">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>网站</th>
+                                <th>昵称</th>
+                                <th>内容</th>
+                                <th>状态</th>
+                                <th>管理员备注</th>
+                                <th>创建时间</th>
+                                <th style="text-align:center">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody class="tbody"></tbody>
+                        </table>
+                    </div>
+                    <nav><ul class="pagination justify-content-center" id="pagination"></ul></nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/assets/static/admin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
+<script type="text/javascript" src="/assets/static/plugin/jquery-confirm/jquery-confirm.min.js"></script>
+<script>
+var page = 1, pageSize = 20;
+function loadReviews() {
+    var status = $('#filter-status').val();
+    var siteId = $('#filter-site').val();
+    var params = 'page=' + page + '&page_size=' + pageSize;
+    if (status) params += '&status=' + status;
+    if (siteId) params += '&site_id=' + siteId;
+    AjaxForm('GET', '/api/admin/reviews?' + params, '', function(){}, function(d) {
+        var html = '';
+        (d.list||[]).forEach(function(r) {
+            var badge = r.status==='approved'?'badge-success':r.status==='rejected'?'badge-danger':'badge-warning';
+            var statusText = r.status==='approved'?'已通过':r.status==='rejected'?'已拒绝':'待审核';
+            html += '<tr><td>'+r.id+'</td><td>'+r.site_title+'</td><td>'+r.nickname+'</td><td>'+r.content+'</td>';
+            html += '<td><span class="badge '+badge+'">'+statusText+'</span></td><td>'+(r.admin_note||'')+'</td><td>'+r.created_at+'</td>';
+            html += '<td style="text-align:center">';
+            if (r.status !== 'approved') html += '<button class="btn btn-sm btn-success m-r-5" onclick="updateReview('+r.id+',\'approved\')">通过</button>';
+            if (r.status !== 'rejected') html += '<button class="btn btn-sm btn-danger" onclick="updateReview('+r.id+',\'rejected\')">拒绝</button>';
+            html += '</td></tr>';
+        });
+        $('.tbody').html(html || '<tr><td colspan="8" class="text-center">暂无数据</td></tr>');
+        renderPagination(d.pagination);
+    }, function(e){ AjaxError(e); });
+}
+function updateReview(id, status) {
+    var note = '';
+    if (status === 'rejected') note = prompt('拒绝原因（可选）:') || '';
+    AjaxPostJson('/api/admin/reviews/'+id, {status:status, admin_note:note}, function(){}, function(d){
+        $.alert({title:'成功',type:'green',content:'操作成功'});
+        loadReviews();
+    }, function(e){ AjaxError(e); });
+}
+function renderPagination(p) {
+    if (!p) return;
+    var total = Math.ceil(p.total / p.per_page_count);
+    var html = '';
+    for (var i=1;i<=total;i++) html += '<li class="page-item'+(i===p.current_page?' active':'')+'"><a class="page-link" href="javascript:void(0)" onclick="page='+i+';loadReviews()">'+i+'</a></li>';
+    $('#pagination').html(html);
+}
+$(function(){ loadReviews(); });
+</script>
+</body>
+</html>

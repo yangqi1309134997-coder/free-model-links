@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
+</head>
+<body>
+<div class="container-fluid p-t-15">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-toolbar d-flex flex-column flex-md-row justify-content-between">
+                    <div class="toolbar-btn-action">
+                        <button class="btn btn-primary" onclick="showAdd()"><i class="mdi mdi-plus"></i> 新增用户</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead><tr><th>ID</th><th>用户名</th><th>角色</th><th>状态</th><th style="text-align:center">操作</th></tr></thead>
+                            <tbody class="tbody"></tbody>
+                        </table>
+                    </div>
+                    <nav><ul class="pagination justify-content-center" id="pagination"></ul></nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/assets/static/admin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
+<script type="text/javascript" src="/assets/static/plugin/jquery-confirm/jquery-confirm.min.js"></script>
+<script>
+var page = 1;
+function loadUsers() {
+    AjaxForm('GET','/api/admin/users?page='+page+'&page_size=20','',function(){},function(d){
+        var html='';
+        (d.list||[]).forEach(function(u){
+            var badge=u.status==='active'?'badge-success':'badge-danger';
+            var statusText=u.status==='active'?'正常':'禁用';
+            html+='<tr><td>'+u.id+'</td><td>'+u.username+'</td><td>'+u.role+'</td>';
+            html+='<td><span class="badge '+badge+'">'+statusText+'</span></td>';
+            html+='<td style="text-align:center">';
+            if(u.status==='active') html+='<button class="btn btn-sm btn-danger" onclick="toggleStatus('+u.id+',\'banned\')">禁用</button>';
+            else html+='<button class="btn btn-sm btn-success" onclick="toggleStatus('+u.id+',\'active\')">启用</button>';
+            html+='</td></tr>';
+        });
+        $('.tbody').html(html||'<tr><td colspan="5" class="text-center">暂无数据</td></tr>');
+        renderPagination(d.pagination);
+    },function(e){AjaxError(e);});
+}
+function toggleStatus(id,status){
+    AjaxPostJson('/api/admin/users/'+id,{status:status},function(){},function(d){
+        $.alert({title:'成功',type:'green',content:'操作成功'});loadUsers();
+    },function(e){AjaxError(e);});
+}
+function showAdd(){$.alert({title:'提示',type:'orange',content:'请通过数据库直接添加管理员用户'});}
+function renderPagination(p){if(!p)return;var total=Math.ceil(p.total/p.per_page_count);var html='';for(var i=1;i<=total;i++)html+='<li class="page-item'+(i===p.current_page?' active':'')+'"><a class="page-link" href="javascript:void(0)" onclick="page='+i+';loadUsers()">'+i+'</a></li>';$('#pagination').html(html);}
+$(function(){loadUsers();});
+</script>
+</body>
+</html>

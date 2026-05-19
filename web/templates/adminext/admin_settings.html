@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
+</head>
+<body>
+<div class="container-fluid p-t-15">
+    <div class="row">
+        <!-- 网站设置 -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header"><h4>网站设置</h4></div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>网站语言</label>
+                        <select class="form-control" id="site-lang">
+                            <option value="zh">中文</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>默认排序</label>
+                        <select class="form-control" id="default-sort">
+                            <option value="sort">默认排序</option>
+                            <option value="rating-desc">评分最高</option>
+                            <option value="newest">最新添加</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>允许匿名评分</label>
+                        <select class="form-control" id="allow-rating">
+                            <option value="true">是</option>
+                            <option value="false">否</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>允许匿名评论</label>
+                        <select class="form-control" id="allow-review">
+                            <option value="true">是</option>
+                            <option value="false">否</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>允许投稿</label>
+                        <select class="form-control" id="allow-submission">
+                            <option value="true">是</option>
+                            <option value="false">否</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSiteSettings()">保存设置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康检查设置 -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header"><h4>健康检查设置</h4></div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>启用健康检查</label>
+                        <select class="form-control" id="health-enabled">
+                            <option value="true">是</option>
+                            <option value="false">否</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>检查间隔（分钟）</label>
+                        <input class="form-control" id="health-interval" type="number" min="5" max="120">
+                    </div>
+                    <div class="form-group">
+                        <label>连续失败自动下线次数</label>
+                        <input class="form-control" id="health-maxfails" type="number" min="3" max="50">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-warning" onclick="triggerCheck()">立即执行检查</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveHealthConfig()">保存设置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:15px">
+        <!-- SEO 设置 -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header"><h4>SEO 优化设置</h4></div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>网站作者</label>
+                        <input class="form-control" id="seo-author" type="text" placeholder="例如：新疆幻城网安科技有限责任公司">
+                    </div>
+                    <div class="form-group">
+                        <label>OG/Twitter 分享图 URL</label>
+                        <input class="form-control" id="seo-og-image" type="text" placeholder="https://example.com/og.png">
+                    </div>
+                    <div class="form-group">
+                        <label>Twitter Card 类型</label>
+                        <select class="form-control" id="seo-twitter-card">
+                            <option value="summary">summary</option>
+                            <option value="summary_large_image">summary_large_image</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>规范链接 Canonical URL</label>
+                        <input class="form-control" id="seo-canonical-url" type="text" placeholder="https://example.com/">
+                    </div>
+                    <div class="form-group">
+                        <label>Robots 指令</label>
+                        <input class="form-control" id="seo-robots" type="text" placeholder="index,follow">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSEO()">保存 SEO 设置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 友情链接设置 -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header"><h4>友情链接</h4></div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>友情链接列表（JSON 格式）</label>
+                        <small class="help-block">格式: [{"name":"名称","url":"https://...","desc":"描述"}]</small>
+                        <textarea class="form-control" id="friend-links" rows="6" placeholder='[{"name":"幻城网安科技","url":"https://hcnsec.cn","desc":"官网"},{"name":"公益大模型 API 分发","url":"https://api.iamhc.cn","desc":"公益 API"}]'></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveFriendLinks()">保存友情链接</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:15px">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header"><h4>首页布局设置</h4></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>每行卡片数</label>
+                                <select class="form-control" id="cards-per-row">
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>显示精选</label>
+                                <select class="form-control" id="show-featured">
+                                    <option value="true">是</option>
+                                    <option value="false">否</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>显示推荐</label>
+                                <select class="form-control" id="show-recommended">
+                                    <option value="true">是</option>
+                                    <option value="false">否</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveHomepageConfig()">保存布局设置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 广告管理 -->
+    <div class="row" style="margin-top:15px">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header"><h4>广告管理</h4></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>广告位筛选</label>
+                                <select class="form-control" id="ad-slot-filter" onchange="loadAds()">
+                                    <option value="">全部</option>
+                                    <option value="homepage_top">首页顶部</option>
+                                    <option value="homepage_bottom">首页底部</option>
+                                    <option value="site_detail_top">详情页顶部</option>
+                                    <option value="site_detail_bottom">详情页底部</option>
+                                    <option value="about_sidebar">关于页侧边栏</option>
+                                    <option value="submit_sidebar">投稿页侧边栏</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3" style="padding-top:24px">
+                            <button class="btn btn-success" onclick="showAdForm()">+ 新建广告</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-striped" style="margin-top:10px">
+                        <thead><tr><th>ID</th><th>名称</th><th>广告位</th><th>类型</th><th>状态</th><th>排序</th><th>操作</th></tr></thead>
+                        <tbody id="ad-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 广告编辑弹窗 -->
+    <div class="modal fade" id="adModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header"><h4 class="modal-title" id="adModalTitle">新建广告</h4></div>
+                <div class="modal-body">
+                    <input type="hidden" id="ad-id">
+                    <div class="form-group">
+                        <label>广告名称</label>
+                        <input class="form-control" id="ad-name" placeholder="例如：首页横幅广告">
+                    </div>
+                    <div class="form-group">
+                        <label>广告位</label>
+                        <select class="form-control" id="ad-slot">
+                            <option value="homepage_top">首页顶部</option>
+                            <option value="homepage_bottom">首页底部</option>
+                            <option value="site_detail_top">详情页顶部</option>
+                            <option value="site_detail_bottom">详情页底部</option>
+                            <option value="about_sidebar">关于页侧边栏</option>
+                            <option value="submit_sidebar">投稿页侧边栏</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>内容类型</label>
+                        <select class="form-control" id="ad-type">
+                            <option value="html">HTML 代码</option>
+                            <option value="image">图片</option>
+                            <option value="text">纯文本</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>内容 / HTML</label>
+                        <textarea class="form-control" id="ad-content" rows="4" placeholder="HTML代码、图片地址或文本内容"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>图片 URL（图片类型必填）</label>
+                        <input class="form-control" id="ad-image" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>链接 URL（点击跳转地址）</label>
+                        <input class="form-control" id="ad-link" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>开始时间（可选）</label>
+                        <input class="form-control" id="ad-start" type="datetime-local">
+                    </div>
+                    <div class="form-group">
+                        <label>结束时间（可选）</label>
+                        <input class="form-control" id="ad-end" type="datetime-local">
+                    </div>
+                    <div class="form-group">
+                        <label>排序</label>
+                        <input class="form-control" id="ad-sort" type="number" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>启用</label>
+                        <select class="form-control" id="ad-enabled">
+                            <option value="true">是</option>
+                            <option value="false">否</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAd()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/assets/static/admin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
+<script type="text/javascript" src="/assets/static/plugin/jquery-confirm/jquery-confirm.min.js"></script>
+<script>
+function loadConfig(){
+    // Load site config
+    AjaxForm('GET','/api/site-config','',function(){},function(c){
+        $('#site-lang').val(c.site_lang||'zh');
+        $('#allow-rating').val(c.allow_anonymous_rating?'true':'false');
+        $('#allow-review').val(c.allow_anonymous_review?'true':'false');
+        $('#allow-submission').val(c.allow_submission?'true':'false');
+    },function(e){});
+
+    // Load health config
+    AjaxForm('GET','/api/admin/health-config','',function(){},function(c){
+        $('#health-enabled').val(c.enabled?'true':'false');
+        $('#health-interval').val(c.interval_minutes);
+        $('#health-maxfails').val(c.max_consecutive_fails);
+    },function(e){});
+
+    // Load homepage config
+    AjaxForm('GET','/api/admin/homepage-config','',function(){},function(c){
+        $('#default-sort').val(c.default_sort||'sort');
+        $('#cards-per-row').val(c.cards_per_row||4);
+        $('#show-featured').val(c.show_featured?'true':'false');
+        $('#show-recommended').val(c.show_recommended?'true':'false');
+    },function(e){});
+
+    // Load SEO config
+    AjaxForm('GET','/api/admin/seo-config','',function(){},function(c){
+        $('#seo-author').val(c.seo_author||'');
+        $('#seo-og-image').val(c.seo_og_image||'');
+        $('#seo-twitter-card').val(c.seo_twitter_card||'summary');
+        $('#seo-canonical-url').val(c.seo_canonical_url||'');
+        $('#seo-robots').val(c.seo_robots||'index,follow');
+        $('#friend-links').val(c.friend_links||'');
+    },function(e){});
+}
+
+function saveSEO(){
+    var data={
+        seo_author:$('#seo-author').val(),
+        seo_og_image:$('#seo-og-image').val(),
+        seo_twitter_card:$('#seo-twitter-card').val(),
+        seo_canonical_url:$('#seo-canonical-url').val(),
+        seo_robots:$('#seo-robots').val()
+    };
+    AjaxPostJson('/api/admin/seo-config',data,function(){},function(d){
+        $.alert({title:'成功',type:'green',content:'SEO 设置已保存'});
+    },function(e){AjaxError(e);});
+}
+
+function saveFriendLinks(){
+    var v=$('#friend-links').val().trim();
+    // 验证 JSON
+    if(v){try{JSON.parse(v)}catch(e){$.alert({title:'错误',type:'red',content:'友情链接 JSON 格式不正确'});return}}
+    AjaxPostJson('/api/admin/friend-links',{friend_links:v},function(){},function(d){
+        $.alert({title:'成功',type:'green',content:'友情链接已保存'});
+    },function(e){AjaxError(e);});
+}
+
+function saveSiteSettings(){
+    var data={
+        site_lang:$('#site-lang').val(),
+        default_sort:$('#default-sort').val(),
+        allow_anonymous_rating:$('#allow-rating').val()==='true',
+        allow_anonymous_review:$('#allow-review').val()==='true',
+        allow_submission:$('#allow-submission').val()==='true'
+    };
+    AjaxPostJson('/api/admin/site-settings',data,function(){},function(d){
+        $.alert({title:'成功',type:'green',content:'网站设置已保存'});
+    },function(e){AjaxError(e);});
+}
+
+function saveHealthConfig(){
+    var data={
+        enabled:$('#health-enabled').val()==='true',
+        interval_minutes:parseInt($('#health-interval').val())||30,
+        max_consecutive_fails:parseInt($('#health-maxfails').val())||10
+    };
+    AjaxPostJson('/api/admin/health-config',data,function(){},function(d){
+        $.alert({title:'成功',type:'green',content:'健康检查设置已保存'});
+    },function(e){AjaxError(e);});
+}
+
+function triggerCheck(){
+    AjaxPostJson('/api/admin/health-trigger',{},function(){},function(d){
+        $.alert({title:'成功',type:'green',content:'健康检查已触发'});
+    },function(e){AjaxError(e);});
+}
+
+function saveHomepageConfig(){
+    var data={
+        default_sort:$('#default-sort').val(),
+        cards_per_row:parseInt($('#cards-per-row').val())||4,
+        show_featured:$('#show-featured').val()==='true',
+        show_recommended:$('#show-recommended').val()==='true'
+    };
+    AjaxPostJson('/api/admin/homepage-config',data,function(){},function(d){
+        $.alert({title:'成功',type:'green',content:'首页布局设置已保存'});
+    },function(e){AjaxError(e);});
+}
+
+// === 广告管理 ===
+var editingAdId = null;
+
+function loadAds(){
+    var slot = $('#ad-slot-filter').val();
+    var url = '/api/admin/ads?page=1&page_size=100';
+    if(slot) url += '&slot=' + encodeURIComponent(slot);
+    AjaxForm('GET',url,'',function(){},function(d){
+        var html = '';
+        if(d.list && d.list.length){
+            d.list.forEach(function(a){
+                html += '<tr>';
+                html += '<td>'+a.id+'</td>';
+                html += '<td>'+escapeHtml(a.name)+'</td>';
+                html += '<td>'+escapeHtml(a.slot)+'</td>';
+                html += '<td>'+escapeHtml(a.content_type)+'</td>';
+                html += '<td>'+(a.is_used?'<span class="label label-success">启用</span>':'<span class="label label-default">停用</span>')+'</td>';
+                html += '<td>'+a.sort+'</td>';
+                html += '<td>';
+                html += '<button class="btn btn-xs btn-primary" onclick="editAd('+a.id+')">编辑</button> ';
+                html += '<button class="btn btn-xs btn-danger" onclick="deleteAd('+a.id+')">删除</button>';
+                html += '</td>';
+                html += '</tr>';
+            });
+        } else {
+            html = '<tr><td colspan="7" style="text-align:center;color:#999">暂无广告</td></tr>';
+        }
+        $('#ad-list').html(html);
+    },function(e){});
+}
+
+function showAdForm(){
+    editingAdId = null;
+    $('#adModalTitle').text('新建广告');
+    $('#ad-id').val('');
+    $('#ad-name').val('');
+    $('#ad-slot').val('homepage_top');
+    $('#ad-type').val('html');
+    $('#ad-content').val('');
+    $('#ad-image').val('');
+    $('#ad-link').val('');
+    $('#ad-start').val('');
+    $('#ad-end').val('');
+    $('#ad-sort').val('0');
+    $('#ad-enabled').val('true');
+    $('#adModal').modal('show');
+}
+
+function editAd(id){
+    editingAdId = id;
+    AjaxForm('GET','/api/admin/ads?page=1&page_size=100','',function(){},function(d){
+        if(!d.list) return;
+        var a = d.list.find(function(x){return x.id===id;});
+        if(!a) return;
+        $('#adModalTitle').text('编辑广告');
+        $('#ad-id').val(a.id);
+        $('#ad-name').val(a.name);
+        $('#ad-slot').val(a.slot);
+        $('#ad-type').val(a.content_type||'html');
+        $('#ad-content').val(a.content||'');
+        $('#ad-image').val(a.image_url||'');
+        $('#ad-link').val(a.link_url||'');
+        $('#ad-start').val(a.start_at ? a.start_at.replace(' ','T') : '');
+        $('#ad-end').val(a.end_at ? a.end_at.replace(' ','T') : '');
+        $('#ad-sort').val(a.sort);
+        $('#ad-enabled').val(a.is_used?'true':'false');
+        $('#adModal').modal('show');
+    },function(e){});
+}
+
+function saveAd(){
+    var data = {
+        name: $('#ad-name').val(),
+        slot: $('#ad-slot').val(),
+        content_type: $('#ad-type').val(),
+        content: $('#ad-content').val(),
+        image_url: $('#ad-image').val(),
+        link_url: $('#ad-link').val(),
+        start_at: $('#ad-start').val() ? $('#ad-start').val().replace('T',' ') + ':00' : '',
+        end_at: $('#ad-end').val() ? $('#ad-end').val().replace('T',' ') + ':00' : '',
+        sort: parseInt($('#ad-sort').val())||0,
+        is_used: $('#ad-enabled').val()==='true'
+    };
+    if(!data.name){$.alert({title:'提示',type:'orange',content:'请输入广告名称'});return}
+    if(!data.slot){$.alert({title:'提示',type:'orange',content:'请选择广告位'});return}
+    var url = '/api/admin/ads';
+    var method = 'POST';
+    if(editingAdId){ url = '/api/admin/ads/' + editingAdId; method = 'PUT'; }
+    AjaxPostJson(url,data,function(){},function(d){
+        $.alert({title:'成功',type:'green',content:'广告已保存'});
+        $('#adModal').modal('hide');
+        loadAds();
+    },function(e){AjaxError(e);});
+}
+
+function deleteAd(id){
+    $.confirm({
+        title: '确认删除', content: '确定删除该广告吗？', type: 'red',
+        buttons: {
+            confirm: { text: '删除', btnClass: 'btn-danger', action: function(){
+                AjaxForm('DELETE','/api/admin/ads/'+id,'',function(){},function(d){
+                    $.alert({title:'成功',type:'green',content:'广告已删除'});
+                    loadAds();
+                },function(e){AjaxError(e);});
+            }},
+            cancel: { text: '取消' }
+        }
+    });
+}
+
+function escapeHtml(text){
+    if(!text) return '';
+    return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+$(function(){loadConfig(); loadAds();});
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/plugin/jquery-confirm/jquery-confirm.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/static/admin/css/style.min.css"/>
+</head>
+<body>
+<div class="container-fluid p-t-15">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-toolbar d-flex flex-column flex-md-row justify-content-between">
+                    <div class="toolbar-btn-action">
+                        <button class="btn btn-primary" onclick="showAdd()"><i class="mdi mdi-plus"></i> 新增支付方式</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead><tr><th>ID</th><th>名称</th><th>图标</th><th>排序</th><th>状态</th><th style="text-align:center">操作</th></tr></thead>
+                            <tbody class="tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/assets/static/admin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/static/admin/js/httpclient.js"></script>
+<script type="text/javascript" src="/assets/static/plugin/jquery-confirm/jquery-confirm.min.js"></script>
+<script>
+function loadPayments(){
+    AjaxForm('GET','/api/admin/payment-methods','',function(){},function(d){
+        var html='';
+        (d.list||[]).forEach(function(p){
+            var badge=p.is_used?'badge-success':'badge-secondary';
+            html+='<tr><td>'+p.id+'</td><td>'+p.name+'</td><td>'+(p.icon||'')+'</td><td>'+p.sort+'</td>';
+            html+='<td><span class="badge '+badge+'">'+(p.is_used?'启用':'禁用')+'</span></td>';
+            html+='<td style="text-align:center">';
+            html+='<button class="btn btn-sm btn-warning m-r-5" onclick="editPayment('+p.id+')">编辑</button>';
+            html+='<button class="btn btn-sm btn-danger" onclick="deletePayment('+p.id+')">删除</button>';
+            html+='</td></tr>';
+        });
+        $('.tbody').html(html||'<tr><td colspan="6" class="text-center">暂无数据</td></tr>');
+    },function(e){AjaxError(e);});
+}
+function showAdd(){
+    $.confirm({title:'新增支付方式',content:'<div class="form-group"><label>名称</label><input class="form-control" id="p-name" required></div><div class="form-group"><label>图标</label><input class="form-control" id="p-icon"></div><div class="form-group"><label>排序</label><input class="form-control" id="p-sort" type="number" value="0"></div>',
+    buttons:{confirm:function(){
+        var data={name:$('#p-name').val(),icon:$('#p-icon').val(),sort:parseInt($('#p-sort').val())||0,is_used:true};
+        AjaxPostJson('/api/admin/payment-methods',data,function(){},function(d){$.alert({title:'成功',type:'green',content:'已添加'});loadPayments();},function(e){AjaxError(e);});
+    },cancel:function(){}}});
+}
+function editPayment(id){
+    $.confirm({title:'编辑支付方式',content:'<div class="form-group"><label>名称</label><input class="form-control" id="p-name" required></div><div class="form-group"><label>图标</label><input class="form-control" id="p-icon"></div><div class="form-group"><label>排序</label><input class="form-control" id="p-sort" type="number"></div><div class="form-group"><label>启用</label><select class="form-control" id="p-used"><option value="true">是</option><option value="false">否</option></select></div>',
+    buttons:{confirm:function(){
+        var data={name:$('#p-name').val(),icon:$('#p-icon').val(),sort:parseInt($('#p-sort').val())||0,is_used:$('#p-used').val()==='true'};
+        AjaxPostJson('/api/admin/payment-methods/'+id,data,function(){},function(d){$.alert({title:'成功',type:'green',content:'已更新'});loadPayments();},function(e){AjaxError(e);});
+    },cancel:function(){}}});
+}
+function deletePayment(id){
+    $.confirm({title:'确认',content:'确定删除?',type:'red',buttons:{confirm:function(){
+        AjaxForm('DELETE','/api/admin/payment-methods/'+id,'',function(){},function(d){$.alert({title:'成功',type:'green',content:'已删除'});loadPayments();},function(e){AjaxError(e);});
+    },cancel:function(){}}});
+}
+$(function(){loadPayments();});
+</script>
+</body>
+</html>
