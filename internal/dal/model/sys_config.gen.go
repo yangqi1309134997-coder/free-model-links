@@ -19,6 +19,29 @@ type SysConfig struct {
 	SiteLogo    string `gorm:"column:site_logo;type:text" json:"site_logo"`
 	SiteFavicon string `gorm:"column:site_favicon;type:text" json:"site_favicon"`
 	SiteURL     string `gorm:"column:site_url;type:varchar(500)" json:"site_url"`
+	SiteLang              string `gorm:"column:site_lang;type:varchar(10);default:'zh'" json:"site_lang"`
+	DefaultSort           string `gorm:"column:default_sort;type:varchar(20);default:'sort'" json:"default_sort"`
+	AllowAnonymousRating  bool   `gorm:"column:allow_anonymous_rating;type:bool;default:false" json:"allow_anonymous_rating"`
+	AllowAnonymousReview  bool   `gorm:"column:allow_anonymous_review;type:bool;default:false" json:"allow_anonymous_review"`
+	AllowSubmission       bool   `gorm:"column:allow_submission;type:bool;default:true" json:"allow_submission"`
+	HealthCheckInterval   int    `gorm:"column:health_check_interval;type:int(11);default:30" json:"health_check_interval"`
+	HealthCheckMaxFails   int    `gorm:"column:health_check_max_fails;type:int(11);default:10" json:"health_check_max_fails"`
+	HealthCheckEnabled    bool   `gorm:"column:health_check_enabled;type:bool;default:true" json:"health_check_enabled"`
+	HomepageSections      string `gorm:"column:homepage_sections;type:text" json:"homepage_sections"`
+	CardsPerRow           int    `gorm:"column:cards_per_row;type:int(11);default:4" json:"cards_per_row"`
+	ShowFeatured          bool   `gorm:"column:show_featured;type:bool;default:true" json:"show_featured"`
+	ShowRecommended       bool   `gorm:"column:show_recommended;type:bool;default:true" json:"show_recommended"`
+	FeaturedSiteIDs       []int  `gorm:"column:featured_site_ids;type:text;serializer:json" json:"featured_site_ids"`
+	// SEO 扩展字段
+	SeoAuthor       string `gorm:"column:seo_author;type:varchar(100)" json:"seo_author"`
+	SeoOgImage      string `gorm:"column:seo_og_image;type:varchar(500)" json:"seo_og_image"`
+	SeoTwitterCard  string `gorm:"column:seo_twitter_card;type:varchar(50)" json:"seo_twitter_card"`
+	SeoCanonicalURL string `gorm:"column:seo_canonical_url;type:varchar(500)" json:"seo_canonical_url"`
+	SeoRobots       string `gorm:"column:seo_robots;type:varchar(100);default:'index,follow'" json:"seo_robots"`
+	// 友情链接（JSON 数组）
+	FriendLinks string `gorm:"column:friend_links;type:text" json:"friend_links"`
+	// 网站版权信息
+	SiteCopyright string `gorm:"column:site_copyright;type:varchar(200);default:'新疆幻城网安科技有限责任公司'" json:"site_copyright"`
 }
 
 // TableName SysConfig's table name

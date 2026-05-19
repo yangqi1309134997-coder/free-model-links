@@ -18,16 +18,17 @@ func (s *service) GetConfig(ctx context.Context) (*v1.ConfigResp, error) {
 	}
 
 	return &v1.ConfigResp{
-		ID:          conf.ID,
-		AboutSite:   conf.AboutSite,
-		AboutAuthor: conf.AboutAuthor,
-		IsAbout:     conf.IsAbout,
-		SiteTitle:   conf.SiteTitle,
-		SiteKeyword: conf.SiteKeyword,
-		SiteDesc:    conf.SiteDesc,
-		SiteRecord:  conf.SiteRecord,
-		SiteURL:     conf.SiteURL,
-		SiteLogo:    conf.SiteLogo,
-		SiteFavicon: conf.SiteFavicon,
+		ID:            conf.ID,
+		AboutSite:     conf.AboutSite,
+		AboutAuthor:   conf.AboutAuthor,
+		IsAbout:       conf.IsAbout,
+		SiteTitle:     conf.SiteTitle,
+		SiteKeyword:   conf.SiteKeyword,
+		SiteDesc:      conf.SiteDesc,
+		SiteRecord:    conf.SiteRecord,
+		SiteURL:       conf.SiteURL,
+		SiteLogo:      conf.SiteLogo,
+		SiteFavicon:   conf.SiteFavicon,
+		SiteCopyright: conf.SiteCopyright,
 	}, nil
 }

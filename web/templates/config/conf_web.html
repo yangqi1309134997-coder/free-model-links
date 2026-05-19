@@ -36,6 +36,10 @@
                                               placeholder="请输入站点描述"></textarea>
                                 </div>
                                 <div class="form-group">
+                                    <label>网站版权信息</label>
+                                    <input type="text" class="form-control" id="siteCopyright" placeholder="例如：新疆幻城网安科技有限责任公司"/>
+                                </div>
+                                <div class="form-group">
                                     <label>网站Logo</label>
                                     <small class="form-text text-muted">建议尺寸：200x50像素</small>
                                     <input type="file" name="file" class="file1" id="siteLogo" accept="image/*"/>
@@ -179,6 +183,9 @@
                 if (data.site_desc) {
                     document.getElementById('siteDesc').value = data.site_desc; // 站点描述
                 }
+                if (data.site_copyright) {
+                    document.getElementById('siteCopyright').value = data.site_copyright; // 网站版权
+                }
                 if (data.site_record) {
                     document.getElementById('siteRecord').value = data.site_record; // 备案信息
                 }
@@ -240,6 +247,7 @@
         const siteTitle = document.getElementById('siteTitle').value; // 网站标题
         const siteKeyword = document.getElementById('siteKeyword').value; // 站点关键词
         const siteDesc = document.getElementById('siteDesc').value; // 站点描述
+        const siteCopyright = document.getElementById('siteCopyright').value; // 网站版权
         const siteRecord = document.getElementById('siteRecord').value; // 备案信息
         const siteURL = document.getElementById('siteURL').value; // 备案信息
         const siteLogo = document.getElementById('siteLogo').files[0]; // 网站Logo
@@ -249,6 +257,7 @@
         formData.append('site_title', siteTitle);
         formData.append('site_keyword', siteKeyword);
         formData.append('site_desc', siteDesc);
+        formData.append('site_copyright', siteCopyright);
         formData.append('site_record', siteRecord);
         formData.append('site_url', siteURL);
         if (siteLogo) {

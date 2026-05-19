@@ -114,6 +114,15 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 		&model.SysMenu{},
 		&model.StCategory{},
 		&model.StSite{},
+		&model.StModel{},
+		&model.StTag{},
+		&model.StSiteTag{},
+		&model.StPaymentMethod{},
+		&model.StSitePayment{},
+		&model.StRating{},
+		&model.StReview{},
+		&model.StSubmission{},
+		&model.StAd{},
 	)
 	if err != nil {
 		fmt.Println("user migrate error")
@@ -128,6 +137,8 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 			field.Attrs(&model.SysUser{
 				Username: DefaultUname,
 				Password: cryptor.Md5String(DefaultUPassword),
+				Role:     "admin",
+				Status:   "active",
 			}),
 		).
 		FirstOrCreate()
@@ -152,13 +163,14 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 		).
 		Attrs(
 			field.Attrs(&model.SysConfig{
-				AboutSite:   DefaultAboutSite,
-				AboutAuthor: DefaultAuthor,
-				SiteTitle:   DefaultSiteTitle,
-				SiteKeyword: DefaultSiteKeyword,
-				SiteDesc:    DefaultSiteDesc,
-				SiteFavicon: DefaultFaviconBase64,
-				SiteLogo:    DefaultLogoBase64,
+				AboutSite:     DefaultAboutSite,
+				AboutAuthor:   DefaultAuthor,
+				SiteTitle:     DefaultSiteTitle,
+				SiteKeyword:   DefaultSiteKeyword,
+				SiteDesc:      DefaultSiteDesc,
+				SiteFavicon:   DefaultFaviconBase64,
+				SiteLogo:      DefaultLogoBase64,
+				SiteCopyright: DefaultSiteCopyright,
 			}),
 		).
 		FirstOrCreate()
