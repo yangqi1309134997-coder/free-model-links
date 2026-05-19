@@ -2,6 +2,8 @@
 
 基于 [webstack-go](https://github.com/ch3nnn/webstack-go) 深度定制开发的 **AI / LLM API 服务商导航平台**，专为聚合、展示和评价大模型 API 中转服务商而设计。由 **新疆幻城网安科技有限责任公司** 维护运营。
 
+> **算力支持**：本项目由 [新疆幻城网安公益大模型 API 中转站](https://api.iamhc.cn) 提供算力与接口测试支持。
+
 > 本项目在 webstack-go v2（Go + Gin + GORM + SQLite）基础上进行了大量功能增强和前端重构，保留了单二进制部署、零依赖（无需 MySQL/Redis）的轻量化优势。
 
 ---
