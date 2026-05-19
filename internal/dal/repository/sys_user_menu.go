@@ -9,26 +9,21 @@ import (
 
 // DefaultSysUserMenuAdmin is used to store the menu information of the admin user DefaultSysMenuAdmin
 var DefaultSysUserMenuAdmin = []*model.SysUserMenu{
-	{
-		UserID: 1,
-		MenuID: 1,
-	},
-	{
-		UserID: 1,
-		MenuID: 2,
-	},
-	{
-		UserID: 1,
-		MenuID: 3,
-	},
-	{
-		UserID: 1,
-		MenuID: 4,
-	},
-	{
-		UserID: 1,
-		MenuID: 5,
-	},
+	{UserID: 1, MenuID: 1},
+	{UserID: 1, MenuID: 2},
+	{UserID: 1, MenuID: 3},
+	{UserID: 1, MenuID: 4},
+	{UserID: 1, MenuID: 5},
+	{UserID: 1, MenuID: 6},
+	{UserID: 1, MenuID: 7},
+	{UserID: 1, MenuID: 8},
+	{UserID: 1, MenuID: 9},
+	{UserID: 1, MenuID: 10},
+	{UserID: 1, MenuID: 11},
+	{UserID: 1, MenuID: 12},
+	{UserID: 1, MenuID: 13},
+	{UserID: 1, MenuID: 14},
+	{UserID: 1, MenuID: 15},
 }
 
 var _ iCustomGenSysUserMenuFunc = (*customSysUserMenuDao)(nil)

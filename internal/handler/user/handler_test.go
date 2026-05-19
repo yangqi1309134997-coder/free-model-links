@@ -47,7 +47,7 @@ func performRequest(r http.Handler, method, path string, body *bytes.Buffer) *ht
 }
 
 func genToken(t *testing.T) string {
-	token, err := j.GenToken(userId, time.Now().Add(time.Hour*24))
+	token, err := j.GenToken(userId, "admin", time.Now().Add(time.Hour*24))
 	if err != nil {
 		t.Error(err)
 		return token

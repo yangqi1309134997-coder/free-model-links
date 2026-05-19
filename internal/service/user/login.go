@@ -22,7 +22,7 @@ func (s *service) Login(ctx context.Context, req *v1.LoginReq) (resp *v1.LoginRe
 		return nil, v1.ErrorUserNameAndPassword
 	}
 
-	token, err := s.Jwt.GenToken(user.ID, time.Now().Add(time.Hour*24))
+	token, err := s.Jwt.GenToken(user.ID, user.Role, time.Now().Add(time.Hour*24))
 	if err != nil {
 		return nil, v1.ErrorTokenGeneration
 	}

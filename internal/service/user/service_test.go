@@ -163,7 +163,7 @@ func TestUserService_Login(t *testing.T) {
 	loginResp, err := userService.Login(ctx, req)
 	assert.NoError(t, err)
 
-	token, err := j.GenToken(user.ID, time.Now().Add(time.Hour*24))
+	token, err := j.GenToken(user.ID, "admin", time.Now().Add(time.Hour*24))
 	assert.NoError(t, err)
 
 	assert.Equal(t, token, loginResp.Token)
