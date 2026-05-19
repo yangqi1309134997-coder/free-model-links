@@ -466,7 +466,19 @@
                     '<div>' +
                     '  <label>排序</label>' +
                     '  <small class="help-block">(相同分类下网站排序)</small>' +
-                    '  <input autofocus="" type="number"  placeholder="请输入排序值" class="form-control"  id="sort_order" value="' + sort + '">' + <!-- 新增排序输入框 -->
+                    '  <input autofocus="" type="number"  placeholder="请输入排序值" class="form-control"  id="sort_order" value="' + sort + '">' +
+                    '</div>' +
+                    '<div>' +
+                    '  <label>标签</label>' +
+                    '  <select class="form-control selectpicker" id="edit_tag_ids" multiple data-live-search="true" data-actions-box="true" data-selected-text-format="count > 3" title="选择标签"></select>' +
+                    '</div>' +
+                    '<div>' +
+                    '  <label>支持的模型</label>' +
+                    '  <select class="form-control selectpicker" id="edit_model_ids" multiple data-live-search="true" data-actions-box="true" data-selected-text-format="count > 3" title="选择模型"></select>' +
+                    '</div>' +
+                    '<div>' +
+                    '  <label>支付方式</label>' +
+                    '  <select class="form-control selectpicker" id="edit_payment_method_ids" multiple data-live-search="true" data-actions-box="true" data-selected-text-format="count > 3" title="选择支付方式"></select>' +
                     '</div>',
                 onOpen: function () {
                     // bootstrap-fileinput 初始化引导文件输入插件
@@ -488,15 +500,69 @@
                         function () {
                         },
                         function (data) {
-                            const treeData = buildTree(data.list);// 将扁平化数据转换为树形结构
-                            const selectElement = document.getElementById('category_id');// 获取 <select> 元素
-                            renderTreeToSelect(treeData, selectElement, 0, [parseInt(category_id)]);  // 渲染树形结构到 <select>
-                            $("#category_id").selectpicker('refresh');// 初始化 Bootstrap Select
+                            const treeData = buildTree(data.list);
+                            const selectElement = document.getElementById('category_id');
+                            renderTreeToSelect(treeData, selectElement, 0, [parseInt(category_id)]);
+                            $("#category_id").selectpicker('refresh');
                         },
                         function (response) {
                             AjaxError(response);
                         }
                     );
+                    // 加载标签
+                    AjaxFormNoAsync("GET", "/api/admin/tags", "", function(){}, function(data) {
+                        var sel = $('#edit_tag_ids');
+                        sel.empty();
+                        if (data.list) {
+                            $.each(data.list, function(i, item) {
+                                sel.append('<option value="' + item.id + '">' + item.name + '</option>');
+                            });
+                        }
+                        // 加载当前网站的标签
+                        AjaxFormNoAsync("GET", "/api/public/site/" + id, "", function(){}, function(siteData) {
+                            if (siteData.tags && siteData.tags.length > 0) {
+                                var tagIds = siteData.tags.map(function(t) { return String(t.id); });
+                                sel.selectpicker('val', tagIds);
+                            }
+                            sel.selectpicker('refresh');
+                        }, function(){});
+                    }, function(response) { AjaxError(response); });
+                    // 加载模型
+                    AjaxFormNoAsync("GET", "/api/admin/models", "", function(){}, function(data) {
+                        var sel = $('#edit_model_ids');
+                        sel.empty();
+                        if (data.list) {
+                            $.each(data.list, function(i, item) {
+                                sel.append('<option value="' + item.id + '">' + item.name + '</option>');
+                            });
+                        }
+                        // 加载当前网站的模型
+                        AjaxFormNoAsync("GET", "/api/public/site/" + id, "", function(){}, function(siteData) {
+                            if (siteData.models && siteData.models.length > 0) {
+                                var modelIds = siteData.models.map(function(m) { return String(m.id); });
+                                sel.selectpicker('val', modelIds);
+                            }
+                            sel.selectpicker('refresh');
+                        }, function(){});
+                    }, function(response) { AjaxError(response); });
+                    // 加载支付方式
+                    AjaxFormNoAsync("GET", "/api/admin/payment-methods", "", function(){}, function(data) {
+                        var sel = $('#edit_payment_method_ids');
+                        sel.empty();
+                        if (data.list) {
+                            $.each(data.list, function(i, item) {
+                                sel.append('<option value="' + item.id + '">' + item.name + '</option>');
+                            });
+                        }
+                        // 加载当前网站的支付方式
+                        AjaxFormNoAsync("GET", "/api/public/site/" + id, "", function(){}, function(siteData) {
+                            if (siteData.payment_methods && siteData.payment_methods.length > 0) {
+                                var pmIds = siteData.payment_methods.map(function(p) { return String(p.id); });
+                                sel.selectpicker('val', pmIds);
+                            }
+                            sel.selectpicker('refresh');
+                        }, function(){});
+                    }, function(response) { AjaxError(response); });
                 },
                 buttons: {
                     sayMyName: {
@@ -542,7 +608,10 @@
                             formData.append('description', description);
                             formData.append('file', $("#file")[0].files[0]);
                             formData.append('category_id', $("#category_id").val());
-                            formData.append('sort', $("#sort_order").val()); // 添加排序值
+                            formData.append('sort', $("#sort_order").val());
+                            formData.append('tag_ids', $("#edit_tag_ids").val() ? $("#edit_tag_ids").val().join(",") : "");
+                            formData.append('model_ids', $("#edit_model_ids").val() ? $("#edit_model_ids").val().join(",") : "");
+                            formData.append('payment_method_ids', $("#edit_payment_method_ids").val() ? $("#edit_payment_method_ids").val().join(",") : "");
 
                             AjaxMultipartForm(
                                 "PUT",

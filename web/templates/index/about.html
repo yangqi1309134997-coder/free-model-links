@@ -4,10 +4,10 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="author" content="viggo"/>
-    <title>WebStack-Go - 网址导航</title>
-    <meta name="keywords" content="网址导航"/>
-    <meta name="description" content="WebStack-Go - 基于 Golang 开源的网址导航网站"/>
+    <meta name="author" content="" id="meta-author"/>
+    <title>关于我们</title>
+    <meta name="keywords" content="API 服务商导航"/>
+    <meta name="description" content="API 服务商导航 - 关于我们"/>
 
     <link rel="shortcut icon" href="/assets/static/index/images/favicon.png"/>
     <link rel="stylesheet" href="/assets/static/index/css/fonts/linecons/css/linecons.css"/>
@@ -31,9 +31,6 @@
             </a>
         </div>
         <div class="navbar-mobile-clear"></div>
-        <a href="https://github.com/ch3nnn/webstack-go" target="_blank">
-            <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" alt="Fork me on GitHub"/>
-        </a>
     </div>
 </nav>
 <div class="page-container">
@@ -46,30 +43,30 @@
                         <div class="row">
                             <div class="col-sm-12" id="website">
                                 <blockquote>
-                                    <p>❤️ 基于 Golang 开源的网址导航网站项目，具备完整的前后台，您可以拿来制作自己平日收藏的网址导航。</p>
-                                    <p>如果你也是开发者，如果你也正好喜欢折腾，那希望这个网站能给你带来一些作用。</p>
+                                    <p>API 服务商导航，汇聚优质的大模型 API 中转服务商，帮助开发者快速找到合适的 API 资源。</p>
+                                    <p>本站由新疆幻城网安科技有限责任公司维护运营，致力于为开发者提供便捷的 API 服务检索体验。</p>
                                 </blockquote>
                             </div>
                         </div>
-                        <h4 class="text-gray">关于站长</h4>
+                        <h4 class="text-gray">关于我们</h4>
                         <div class="row">
                             <div class="col-sm-12" id="about">
                                 <div class="col-sm-4">
                                     <div
                                             class="xe-widget xe-conversations box2 label-info"
-                                            onclick="window.open('https://blog.ch3nnn.cn/about/', '_blank')"
+                                            onclick="window.open('https://hcnsec.cn', '_blank')"
                                             data-toggle="tooltip"
                                             data-placement="bottom"
                                             title=""
-                                            data-original-title="https://blog.ch3nnn.cn/about/"
+                                            data-original-title="https://hcnsec.cn"
                                     >
                                         <div class="xe-comment-entry">
                                             <a class="xe-user-img">
-                                                <img src="https://s2.loli.net/2023/02/20/H1k52mlXNYKWDrU.png" class="img-circle" width="40"/>
+                                                <img src="/assets/static/index/images/favicon.png" class="img-circle" width="40"/>
                                             </a>
                                             <div class="xe-comment">
-                                                <a href="#" class="xe-user-name overflowClip_1"><strong>Developer. Ch3nnn.</strong></a>
-                                                <p class="overflowClip_2">折腾不息 · 乐此不疲.</p>
+                                                <a href="#" class="xe-user-name overflowClip_1"><strong>新疆幻城网安科技有限责任公司</strong></a>
+                                                <p class="overflowClip_2">专注网络安全与技术服务</p>
                                             </div>
                                         </div>
                                     </div>
@@ -80,8 +77,7 @@
                                             <br/>
                                             <blockquote>
                                                 <p>
-                                                    这是一个公益项目，而且是<a href="https://github.com/ch3nnn/webstack-go"> 开源 </a>的。你也可以拿来制作自己的网址导航。如果你有更好的想法，可以通过个人网站
-                                                    <a href="https://ch3nnn.cn/about/">ch3nnn.cn</a>中的联系方式找到我，欢迎与我交流分享。
+                                                    新疆幻城网安科技有限责任公司致力于提供优质的网络安全技术服务。本站作为 API 服务商导航平台，旨在帮助开发者高效发现和对接大模型 API 资源。如有合作意向，欢迎访问我们的官网 <a href="https://hcnsec.cn">hcnsec.cn</a> 联系交流。
                                                 </p>
                                             </blockquote>
                                         </div>
@@ -94,12 +90,15 @@
                 </div>
             </div>
         </div>
+        <!-- 广告位：关于页侧边栏 -->
+        <div id="ad-about-sidebar" style="max-width:900px;margin:24px auto;padding:0 15px;"></div>
+
         <!-- Main Footer -->
         <footer class="main-footer sticky footer-type-1 fixed">
             <div class="footer-inner">
                 <div class="footer-text">
-                    &copy; 2022- 2023
-                    <a href="/about"><strong>WebStack-Go</strong></a> design by <a href="https://ch3nnn.cn" target="_blank"><strong>Ch3nnn</strong></a>
+                    &copy; 2024-2026
+                    <a href="https://hcnsec.cn" target="_blank"><strong>新疆幻城网安科技有限责任公司</strong></a>
                 </div>
                 <div class="go-up">
                     <a href="#" rel="go-top">
@@ -119,6 +118,14 @@
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-markdown-editor/js/marked.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
+        // Load site config for copyright
+        fetch('/api/site-config').then(r=>r.json()).then(c=>{
+            var copyright = c.site_copyright || '新疆幻城网安科技有限责任公司';
+            document.getElementById('meta-author').setAttribute('content', copyright);
+            var footerLink = document.querySelector('.main-footer a');
+            if(footerLink) footerLink.textContent = copyright;
+        }).catch(function(){});
+
         AjaxForm(
             "GET",
             "/api/about",
@@ -145,6 +152,29 @@
 
 
     })
+
+    // 加载广告
+    function loadAds(slot, containerId){
+        fetch('/api/ads?slot='+slot).then(r=>r.json()).then(d=>{
+            if(!d.list || !d.list.length) return;
+            var container = document.getElementById(containerId);
+            if(!container) return;
+            var html = '';
+            d.list.forEach(function(ad){
+                if(ad.content_type==='html'){
+                    html += '<div class="ad-unit" style="margin-bottom:12px;">'+ad.content+'</div>';
+                } else if(ad.content_type==='image' && ad.image_url){
+                    var link = ad.link_url ? '<a href="'+ad.link_url+'" target="_blank" rel="noopener"><img src="'+ad.image_url+'" style="max-width:100%;border-radius:4px;" alt=""></a>' : '<img src="'+ad.image_url+'" style="max-width:100%;border-radius:4px;" alt="">';
+                    html += '<div class="ad-unit" style="margin-bottom:12px;">'+link+'</div>';
+                } else if(ad.content_type==='text'){
+                    var link = ad.link_url ? '<a href="'+ad.link_url+'" target="_blank" rel="noopener">'+ad.content+'</a>' : ad.content;
+                    html += '<div class="ad-unit" style="margin-bottom:12px;padding:12px;background:#fff;border:1px solid #e5e5e5;border-radius:4px;font-size:13px;">'+link+'</div>';
+                }
+            });
+            container.innerHTML = html;
+        }).catch(function(){});
+    }
+    loadAds('about_sidebar','ad-about-sidebar');
 </script>
 
 <textarea tabindex="-1" style="position: absolute; top: -999px; left: 0px; right: auto; bottom: auto; border: 0px; padding: 0px; box-sizing: content-box; word-wrap: break-word; overflow: hidden; transition: none; height: 0px !important; min-height: 0px !important; font-family: Arimo, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 400; font-style: normal; letter-spacing: 0px; text-transform: none; word-spacing: 0px; text-indent: 0px; line-height: 18.5714px; width: 53px;" class="autosizejs" id="autosizejs"></textarea>

@@ -94,27 +94,26 @@
 <script type="text/javascript" src="/assets/static/plugin/bootstrap-select/i18n/defaults-zh_CN.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        // Font Awesome 图标列表
+        // 图标列表（中文名称）
         const icons = [
-            'linecons-music', 'linecons-search', 'linecons-mail', 'linecons-heart',
-            'linecons-star', 'linecons-user', 'linecons-videocam', 'linecons-camera',
-            'linecons-photo', 'linecons-attach', 'linecons-lock', 'linecons-eye',
-            'linecons-tag', 'linecons-thumbs-up', 'linecons-pencil', 'linecons-comment',
-            'linecons-location', 'linecons-cup', 'linecons-trash', 'linecons-doc',
-            'linecons-note', 'linecons-cog', 'linecons-params', 'linecons-calendar',
-            'linecons-sound', 'linecons-clock', 'linecons-lightbulb', 'linecons-tv',
-            'linecons-desktop', 'linecons-mobile', 'linecons-cd', 'linecons-inbox',
-            'linecons-globe', 'linecons-cloud', 'linecons-paper-plane', 'linecons-fire',
-            'linecons-graduation-cap', 'linecons-megaphone', 'linecons-database', 'linecons-key',
-            'linecons-beaker', 'linecons-truck', 'linecons-money', 'linecons-food', 'linecons-shop',
-            'linecons-diamond', 'linecons-t-shirt', 'linecons-wallet',
-            // 添加更多图标...
+            ['linecons-music', '音乐'], ['linecons-search', '搜索'], ['linecons-mail', '邮件'], ['linecons-heart', '心形'],
+            ['linecons-star', '星标'], ['linecons-user', '用户'], ['linecons-videocam', '摄像'], ['linecons-camera', '相机'],
+            ['linecons-photo', '图片'], ['linecons-attach', '附件'], ['linecons-lock', '锁'], ['linecons-eye', '眼睛'],
+            ['linecons-tag', '标签'], ['linecons-thumbs-up', '点赞'], ['linecons-pencil', '编辑'], ['linecons-comment', '评论'],
+            ['linecons-location', '定位'], ['linecons-cup', '奖杯'], ['linecons-trash', '回收站'], ['linecons-doc', '文档'],
+            ['linecons-note', '笔记'], ['linecons-cog', '设置'], ['linecons-params', '参数'], ['linecons-calendar', '日历'],
+            ['linecons-sound', '声音'], ['linecons-clock', '时钟'], ['linecons-lightbulb', '灯泡'], ['linecons-tv', '电视'],
+            ['linecons-desktop', '桌面'], ['linecons-mobile', '手机'], ['linecons-cd', '光盘'], ['linecons-inbox', '收件箱'],
+            ['linecons-globe', '地球'], ['linecons-cloud', '云'], ['linecons-paper-plane', '发送'], ['linecons-fire', '火焰'],
+            ['linecons-graduation-cap', '学位帽'], ['linecons-megaphone', '喇叭'], ['linecons-database', '数据库'], ['linecons-key', '钥匙'],
+            ['linecons-beaker', '实验'], ['linecons-truck', '运输'], ['linecons-money', '金钱'], ['linecons-food', '食物'], ['linecons-shop', '商店'],
+            ['linecons-diamond', '钻石'], ['linecons-t-shirt', 'T恤'], ['linecons-wallet', '钱包'],
         ];
 
         // 动态生成选项
         const select = $('#icon');
-        icons.forEach(icon => {
-            const option = `<option data-content="<i class='${icon}'></i> ${icon}">${icon}</option>`;
+        icons.forEach(([cls, label]) => {
+            const option = `<option data-content="<i class='${cls}'></i> ${label}" value="${cls}">${label}</option>`;
             select.append(option);
         });
 
@@ -149,7 +148,22 @@
                         field: 'link',
                         title: '分类图标',
                         formatter: function (value, row, index) {
-                            return '<i class="' + row.icon + '"></i>'
+                            var iconMap = {
+                                'linecons-music':'音乐','linecons-search':'搜索','linecons-mail':'邮件','linecons-heart':'心形',
+                                'linecons-star':'星标','linecons-user':'用户','linecons-videocam':'摄像','linecons-camera':'相机',
+                                'linecons-photo':'图片','linecons-attach':'附件','linecons-lock':'锁','linecons-eye':'眼睛',
+                                'linecons-tag':'标签','linecons-thumbs-up':'点赞','linecons-pencil':'编辑','linecons-comment':'评论',
+                                'linecons-location':'定位','linecons-cup':'奖杯','linecons-trash':'回收站','linecons-doc':'文档',
+                                'linecons-note':'笔记','linecons-cog':'设置','linecons-params':'参数','linecons-calendar':'日历',
+                                'linecons-sound':'声音','linecons-clock':'时钟','linecons-lightbulb':'灯泡','linecons-tv':'电视',
+                                'linecons-desktop':'桌面','linecons-mobile':'手机','linecons-cd':'光盘','linecons-inbox':'收件箱',
+                                'linecons-globe':'地球','linecons-cloud':'云','linecons-paper-plane':'发送','linecons-fire':'火焰',
+                                'linecons-graduation-cap':'学位帽','linecons-megaphone':'喇叭','linecons-database':'数据库','linecons-key':'钥匙',
+                                'linecons-beaker':'实验','linecons-truck':'运输','linecons-money':'金钱','linecons-food':'食物','linecons-shop':'商店',
+                                'linecons-diamond':'钻石','linecons-t-shirt':'T恤','linecons-wallet':'钱包'
+                            };
+                            var label = iconMap[row.icon] || row.icon;
+                            return '<i class="' + row.icon + '"></i> ' + label;
                         }
                     },
                     {

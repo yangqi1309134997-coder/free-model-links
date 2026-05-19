@@ -19,7 +19,7 @@
                     <div class="card-title">新增网站</div>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info" role="alert">注📢: 新增完成后根据网址自动获取标题、Logo、网站描述, 对内容不满可以点击编辑修改呦!</div>
+                    <div class="alert alert-info" role="alert">注📢: 新增完成后根据网址自动获取标题、Logo、网站描述, 对内容不满可以点击编辑修改呦! 如果手动填写下方的"标题/描述/Logo URL"，将跳过对应字段的自动抓取。</div>
                     <form>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -57,6 +57,42 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label>网站标题（手动填写，可选）</label>
+                            <small class="help-block">(填写后将跳过自动抓取标题)</small>
+                            <input type="text" class="form-control" id="manual_title" placeholder="不填则自动抓取网页 title">
+                        </div>
+
+                        <div class="form-group">
+                            <label>网站描述（手动填写，可选）</label>
+                            <small class="help-block">(填写后将跳过自动抓取描述)</small>
+                            <textarea class="form-control" id="manual_description" rows="2" placeholder="不填则自动抓取 meta description"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Logo URL（手动填写，可选）</label>
+                            <small class="help-block">(填写后将跳过自动抓取 Logo)</small>
+                            <input type="text" class="form-control" id="manual_icon" placeholder="不填则自动抓取 favicon">
+                        </div>
+
+                        <div class="form-group">
+                            <label>标签</label>
+                            <select class="form-control selectpicker" id="tag_ids" multiple data-live-search="true" data-actions-box="true" data-selected-text-format="count > 3" title="选择标签">
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>支持的模型</label>
+                            <select class="form-control selectpicker" id="model_ids" multiple data-live-search="true" data-actions-box="true" data-selected-text-format="count > 3" title="选择模型">
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>支付方式</label>
+                            <select class="form-control selectpicker" id="payment_method_ids" multiple data-live-search="true" data-actions-box="true" data-selected-text-format="count > 3" title="选择支付方式">
+                            </select>
+                        </div>
+
                         <button type="button" id="btnOk" class="btn btn-primary">确认</button>
                         <button type="button" id="btnLoading" class="btn btn-primary" disabled style="display: none">
                             <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
@@ -79,6 +115,7 @@
 <script type="text/javascript" src="/assets/static/admin/js/utils.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
+        // 加载分类
         AjaxFormNoAsync(
             "GET",
             "/api/admin/category",
@@ -86,14 +123,70 @@
             function () {
             },
             function (data) {
-                // 将扁平化数据转换为树形结构
                 const treeData = buildTree(data.list);
-                // 获取 <select> 元素
                 const selectElement = document.getElementById('category_id');
-                // 渲染树形结构到 <select>
                 renderTreeToSelect(treeData, selectElement, 0, []);
-                // 初始化 Bootstrap Select
-                $('#tree-select').selectpicker();
+                $('#category_id').selectpicker('refresh');
+            },
+            function (response) {
+                AjaxError(response);
+            }
+        );
+
+        // 加载标签
+        AjaxFormNoAsync(
+            "GET",
+            "/api/admin/tags",
+            "",
+            function () {},
+            function (data) {
+                const sel = $('#tag_ids');
+                if (data.list) {
+                    $.each(data.list, function (i, item) {
+                        sel.append('<option value="' + item.id + '">' + item.name + '</option>');
+                    });
+                }
+                sel.selectpicker('refresh');
+            },
+            function (response) {
+                AjaxError(response);
+            }
+        );
+
+        // 加载模型
+        AjaxFormNoAsync(
+            "GET",
+            "/api/admin/models",
+            "",
+            function () {},
+            function (data) {
+                const sel = $('#model_ids');
+                if (data.list) {
+                    $.each(data.list, function (i, item) {
+                        sel.append('<option value="' + item.id + '">' + item.name + '</option>');
+                    });
+                }
+                sel.selectpicker('refresh');
+            },
+            function (response) {
+                AjaxError(response);
+            }
+        );
+
+        // 加载支付方式
+        AjaxFormNoAsync(
+            "GET",
+            "/api/admin/payment-methods",
+            "",
+            function () {},
+            function (data) {
+                const sel = $('#payment_method_ids');
+                if (data.list) {
+                    $.each(data.list, function (i, item) {
+                        sel.append('<option value="' + item.id + '">' + item.name + '</option>');
+                    });
+                }
+                sel.selectpicker('refresh');
             },
             function (response) {
                 AjaxError(response);
@@ -117,9 +210,7 @@
                 return false;
             }
             const failSwitch = $("#allowSaveUrlOnFailure").is(":checked");
-            // 获取所有 name 为 customRadioInline 的单选按钮
             const radios = document.querySelectorAll('input[name="customRadioInline"]');
-            // 遍历单选按钮，找到选中的值
             let selectedValue;
             radios.forEach(radio => {
                 if (radio.checked) {
@@ -132,6 +223,12 @@
                 url: url,
                 is_used: selectedValue === "1",
                 fail_switch: failSwitch,
+                tag_ids: $("#tag_ids").val() ? $("#tag_ids").val().join(",") : "",
+                model_ids: $("#model_ids").val() ? $("#model_ids").val().join(",") : "",
+                payment_method_ids: $("#payment_method_ids").val() ? $("#payment_method_ids").val().join(",") : "",
+                manual_title: $("#manual_title").val(),
+                manual_description: $("#manual_description").val(),
+                manual_icon: $("#manual_icon").val(),
             };
 
             AjaxForm(
@@ -143,31 +240,29 @@
                     $("#btnLoading").show();
                 },
                 function (data) {
-                    // 动态生成失败 URL 的 HTML 内容
                     let failURLsHTML = '';
                     if (data.failURLs && data.failURLs.length > 0) {
                         failURLsHTML += '<div class="card-title">以下 URL 创建失败：</div>';
                         data.failURLs.forEach(function (url) {
                             failURLsHTML += `
-			                            <div class="alert alert-warning" role="alert">
-			                                <a href="#!" class="alert-link">${url}</a>
-			                            </div>
-			                        `;
+                            <div class="alert alert-warning" role="alert">
+                                <a href="#!" class="alert-link">${url}</a>
+                            </div>
+                        `;
                         });
                     } else {
                         failURLsHTML = '<div class="alert alert-info" role="alert">无失败 URL。</div>';
                     }
-                    // 弹窗内容
                     const content = `
-			                    <div class="card">
-			                        <header class="card-header">
-			                            <div class="card-title">成功创建：${data.successCount} 条, 失败创建：${data.failCount} 条</div>
-			                        </header>
-			                        <div class="card-body">
-			                            ${failURLsHTML}
-			                        </div>
-			                    </div>
-			                `;
+                    <div class="card">
+                        <header class="card-header">
+                            <div class="card-title">成功创建：${data.successCount} 条, 失败创建：${data.failCount} 条</div>
+                        </header>
+                        <div class="card-body">
+                            ${failURLsHTML}
+                        </div>
+                    </div>
+                `;
                     $.alert({
                         title: '操作成功',
                         icon: 'mdi mdi-check-decagram',
@@ -177,10 +272,10 @@
                             okay: {
                                 text: '关闭',
                                 action: function () {
-                                    if (data.failCount > 0) { // 如果有失败的 URL，则显示执行中按钮
+                                    if (data.failCount > 0) {
                                         $("#btnLoading").hide();
                                         $("#btnOk").show();
-                                    } else { // 如果没有失败的 URL，则直接跳转到网站列表页
+                                    } else {
                                         location.href = "/admin/site";
                                     }
                                 }

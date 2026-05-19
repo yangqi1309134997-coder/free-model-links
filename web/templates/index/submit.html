@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提交网站</title>
+    <link rel="stylesheet" href="/assets/static/index/css/apple-design.css">
+    <style>
+        .auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .auth-card { width: 100%; max-width: 480px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 40px; box-shadow: var(--shadow-lg); }
+        .auth-card h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; text-align: center; }
+        .auth-card p { font-size: 14px; color: var(--text-secondary); text-align: center; margin-bottom: 32px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; height: 44px; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0 14px; font-size: 15px; background: var(--bg-input); color: var(--text-primary); transition: all var(--transition-fast); font-family: var(--font-sans); }
+        .form-group textarea { height: 80px; padding: 10px 14px; resize: vertical; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-light); }
+        .auth-card .btn { width: 100%; height: 44px; font-size: 15px; }
+        .msg { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 16px; display: none; }
+        .msg-error { background: #ff3b3010; color: var(--danger); border: 1px solid #ff3b3030; }
+        .msg-success { background: #34c75910; color: var(--success); border: 1px solid #34c75930; }
+    </style>
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card">
+        <h2>投稿网站</h2>
+        <p>推荐一个你觉得好用的 API 服务商</p>
+        <div class="msg" id="msg"></div>
+        <form onsubmit="return doSubmit(event)">
+            <div class="form-group">
+                <label>网站地址 *</label>
+                <input type="url" id="url" placeholder="https://..." required>
+            </div>
+            <div class="form-group">
+                <label>网站名称 *</label>
+                <input type="text" id="title" placeholder="例如：OpenRouter" required>
+            </div>
+            <div class="form-group">
+                <label>简要描述</label>
+                <textarea id="description" placeholder="简单介绍一下这个网站..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>联系方式（可选）</label>
+                <input type="text" id="contact" placeholder="邮箱或其他联系方式">
+            </div>
+            <button type="submit" class="btn btn-primary">提交投稿</button>
+        </form>
+        <p style="margin-top:16px"><a href="/" style="color:var(--accent);text-decoration:none">← 返回首页</a></p>
+    </div>
+</div>
+
+<!-- 广告位：投稿页侧边栏 -->
+<div id="ad-submit-sidebar" style="max-width:480px;margin:0 auto 24px;padding:0 24px;"></div>
+
+<script>
+(function(){var s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s)})();
+function doSubmit(e) {
+    e.preventDefault();
+    var data = { url: document.getElementById('url').value, title: document.getElementById('title').value, description: document.getElementById('description').value, contact: document.getElementById('contact').value };
+    fetch('/api/submissions', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) })
+    .then(r => r.json()).then(d => {
+        var m = document.getElementById('msg');
+        m.style.display = 'block';
+        if(d.id) { m.className='msg msg-success'; m.textContent='投稿成功！管理员审核后将上线。'; document.querySelector('form').reset(); }
+        else { m.className='msg msg-error'; m.textContent=d.message||'提交失败'; }
+    }).catch(() => { var m=document.getElementById('msg'); m.style.display='block'; m.className='msg msg-error'; m.textContent='网络错误'; });
+    return false;
+}
+
+// 加载广告
+function loadAds(slot, containerId){
+    fetch('/api/ads?slot='+slot).then(r=>r.json()).then(d=>{
+        if(!d.list || !d.list.length) return;
+        var container = document.getElementById(containerId);
+        if(!container) return;
+        var html = '';
+        d.list.forEach(function(ad){
+            if(ad.content_type==='html'){
+                html += '<div class="ad-unit" style="margin-bottom:12px;">'+ad.content+'</div>';
+            } else if(ad.content_type==='image' && ad.image_url){
+                var link = ad.link_url ? '<a href="'+ad.link_url+'" target="_blank" rel="noopener"><img src="'+ad.image_url+'" style="max-width:100%;border-radius:var(--radius-md);" alt=""></a>' : '<img src="'+ad.image_url+'" style="max-width:100%;border-radius:var(--radius-md);" alt="">';
+                html += '<div class="ad-unit" style="margin-bottom:12px;">'+link+'</div>';
+            } else if(ad.content_type==='text'){
+                var link = ad.link_url ? '<a href="'+ad.link_url+'" target="_blank" rel="noopener" style="color:var(--accent);">'+ad.content+'</a>' : ad.content;
+                html += '<div class="ad-unit" style="margin-bottom:12px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;color:var(--text-secondary);">'+link+'</div>';
+            }
+        });
+        container.innerHTML = html;
+    }).catch(function(){});
+}
+loadAds('submit_sidebar','ad-submit-sidebar');
+</script>
+</body>
+</html>

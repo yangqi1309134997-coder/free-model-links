@@ -1,298 +1,197 @@
 <!DOCTYPE html>
-<html lang="zh">
-
+<html lang="{{ .ConfigSite.SiteLang }}" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="author" content="viggo"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .ConfigSite.SiteTitle }}</title>
     <meta name="keywords" content="{{ .ConfigSite.SiteKeyword }}">
     <meta name="description" content="{{ .ConfigSite.SiteDesc }}">
-
-    {{ if .ConfigSite.SiteFavicon }}
-        <link rel="shortcut icon" href="data:image/png;base64,{{ .ConfigSite.SiteFavicon }}">
-    {{ else }}
-        <link rel="shortcut icon" href="/assets/static/index/images/favicon.png">
-    {{ end }}
-
-    <link rel="stylesheet" href="/assets/static/index/css/fonts/linecons/css/linecons.css">
-    <link rel="stylesheet" href="/assets/static/index/css/fonts/fontawesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/assets/static/index/css/bootstrap.css">
-    <link rel="stylesheet" href="/assets/static/index/css/xenon-core.css">
-    <link rel="stylesheet" href="/assets/static/index/css/xenon-components.css">
-    <link rel="stylesheet" href="/assets/static/index/css/xenon-skins.css">
-    <link rel="stylesheet" href="/assets/static/index/css/nav.css">
-    <link rel="stylesheet" href="/assets/static/index/css/hclonely.css">
-    <script src="assets/static/index/js/jquery-1.11.1.min.js"></script>
-    <script>
-        var userDefinedSearchData = {
-            "custom": false,
-            "thisSearch": "https://www.baidu.com/s?wd=",
-            "thisSearchIcon": "url(https://www.baidu.com/favicon.ico)",
-            "hotStatus": true,
-            "data": [{"name": "百度", "img": "url(https://www.baidu.com/favicon.ico)", "url": "https://www.baidu.com/s?wd="}]
-        };
+    {{ if .ConfigSite.SeoAuthor }}<meta name="author" content="{{ .ConfigSite.SeoAuthor }}">{{ else }}<meta name="author" content="{{ .ConfigSite.SiteCopyright }}">{{ end }}
+    <meta name="robots" content="{{ if .ConfigSite.SeoRobots }}{{ .ConfigSite.SeoRobots }}{{ else }}index,follow{{ end }}">
+    {{ if .ConfigSite.SeoCanonicalURL }}<link rel="canonical" href="{{ .ConfigSite.SeoCanonicalURL }}">{{ end }}
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ .ConfigSite.SiteTitle }}">
+    <meta property="og:description" content="{{ .ConfigSite.SiteDesc }}">
+    <meta property="og:type" content="website">
+    {{ if .ConfigSite.SiteURL }}<meta property="og:url" content="{{ .ConfigSite.SiteURL }}">{{ end }}
+    {{ if .ConfigSite.SeoOgImage }}<meta property="og:image" content="{{ .ConfigSite.SeoOgImage }}">{{ end }}
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="{{ if .ConfigSite.SeoTwitterCard }}{{ .ConfigSite.SeoTwitterCard }}{{ else }}summary{{ end }}">
+    <meta name="twitter:title" content="{{ .ConfigSite.SiteTitle }}">
+    <meta name="twitter:description" content="{{ .ConfigSite.SiteDesc }}">
+    {{ if .ConfigSite.SeoOgImage }}<meta name="twitter:image" content="{{ .ConfigSite.SeoOgImage }}">{{ end }}
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "{{ .ConfigSite.SiteTitle }}",
+      "url": "{{ .ConfigSite.SiteURL }}",
+      "description": "{{ .ConfigSite.SiteDesc }}",
+      "publisher": {
+        "@type": "Organization",
+        "name": "{{ .ConfigSite.SiteCopyright }}",
+        "url": "https://hcnsec.cn"
+      }
+    }
     </script>
-    <script src="assets/static/index/js/header.js"></script>
+    {{ if .ConfigSite.SiteFavicon }}
+    <link rel="shortcut icon" href="data:image/png;base64,{{ .ConfigSite.SiteFavicon }}">
+    {{ else }}
+    <link rel="shortcut icon" href="/assets/static/index/images/favicon.png">
+    {{ end }}
+    <link rel="stylesheet" href="/assets/static/index/css/apple-design.css">
 </head>
+<body>
 
-<body class="page-body">
-<!-- skin-white -->
-<div class="page-container">
-    <div class="sidebar-menu toggle-others fixed">
-        <div class="sidebar-menu-inner">
-            <header class="logo-env">
-                <!-- logo -->
-                <div class="logo">
-                    <a href="/" class="logo-expanded">
-                        {{ if .ConfigSite.SiteLogo }}
-                            <img src="data:image/png;base64,{{ .ConfigSite.SiteLogo }}" width="100%" alt=""/>
-                        {{ else }}
-                            <img src="assets/static/index/images/logo@2x.png" width="100%" alt=""/>
-                        {{ end }}
-                    </a>
-                    <a href="index.html" class="logo-collapsed">
-                        <img src="assets/static/index/images/logo-collapsed@2x.png" width="40" alt=""/>
-                    </a>
-                </div>
-                <div class="mobile-menu-toggle visible-xs">
-                    <a href="#" data-toggle="user-info-menu">
-                        <i class="linecons-cog"></i>
-                    </a>
-                    <a href="#" data-toggle="mobile-menu">
-                        <i class="fa-bars"></i>
-                    </a>
-                </div>
-            </header>
-            <ul id="main-menu" class="main-menu">
-                {{ range .CategoryTree }}
-                {{ if .Child }}
-                <li>
-                    <a>
-                        <i class="{{ .Icon }}"></i>
-                        <span class="title">{{ .Name }}</span>
-                    </a>
-                    <ul>
-                        {{ range .Child }}
-                        <li>
-                            <a href="#{{ .Name }}" class="smooth"><span class="title">{{ .Name }}</span></a>
-                        </li>
-                        {{ end }}
-                    </ul>
-                </li>
-                {{ else }}
-                <li>
-                    <a href="#{{ .Name }}" class="smooth">
-                        <i class="{{ .Icon }}"></i>
-                        <span class="title">{{.Name}}</span>
-                    </a>
-                </li>
-                {{ end }}
-                {{ end }}
-
-                {{ if .About.IsAbout }}
-                <li>
-                    <a href="/about">
-                        <i class="lni lni-heart"></i>
-                        <span class="tooltip-blue">关于本站</span>
-                        <span class="label label-Primary pull-right hidden-collapsed">♥︎</span>
-                    </a>
-                </li>
-                {{ end }}
-            </ul>
-        </div>
-    </div>
-    <div class="main-content">
-        <nav class="navbar user-info-navbar" role="navigation">
-            <!-- User Info, Notifications and Menu Bar -->
-            <!-- Left links for user info navbar -->
-            <ul class="user-info-menu left-links list-inline list-unstyled">
-                <li class="hidden-sm hidden-xs">
-                    <a href="#" data-toggle="sidebar">
-                        <i class="fa-bars"></i>
-                    </a>
-                </li>
-                <!-- 暗黑模式 -->
-                <li class="switch-mode hover-line" onclick="switchNightMode()">
-                    <a href="#">
-                        <svg t="1593061068148" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                             p-id="1681" width="16" height="16">
-                            <path d="M582.4 326.4c-140.8 0-256 115.2-256 256s115.2 256 256 256 256-115.2 256-256-115.2-256-256-256z m0 448c-70.4 0-131.2-36.8-164.8-92.8 12.8 3.2 27.2 4.8 40 4.8 121.6 0 219.2-99.2 219.2-219.2 0-17.6-1.6-35.2-6.4-52.8 60.8 32 102.4 96 102.4 169.6 1.6 104-84.8 190.4-190.4 190.4zM582.4 262.4c17.6 0 32-14.4 32-32v-128c0-17.6-14.4-32-32-32s-32 14.4-32 32v128c0 17.6 14.4 32 32 32zM262.4 582.4c0-17.6-14.4-32-32-32h-128c-17.6 0-32 14.4-32 32s14.4 32 32 32h128c17.6 0 32-14.4 32-32zM310.4 356.8c6.4 6.4 14.4 9.6 22.4 9.6 8 0 16-3.2 22.4-9.6 12.8-12.8 12.8-32 0-44.8l-91.2-91.2c-12.8-12.8-32-12.8-44.8 0-12.8 12.8-12.8 32 0 44.8l91.2 91.2zM944 220.8c-12.8-12.8-32-12.8-44.8 0l-91.2 91.2c-12.8 12.8-12.8 32 0 44.8 6.4 6.4 14.4 9.6 22.4 9.6 8 0 16-3.2 22.4-9.6l91.2-91.2c12.8-12.8 12.8-33.6 0-44.8zM310.4 808l-91.2 91.2c-12.8 12.8-12.8 32 0 44.8 6.4 6.4 14.4 9.6 22.4 9.6 8 0 16-3.2 22.4-9.6l91.2-91.2c12.8-12.8 12.8-32 0-44.8-11.2-11.2-32-11.2-44.8 0z"
-                                  p-id="1682" fill="#707070"></path>
-                        </svg>
-                    </a>
-                </li>
-
-            </ul>
-            <ul class="user-info-menu right-links list-inline list-unstyled">
-                <li class="hidden-sm hidden-xs">
-                    <a href="https://github.com/ch3nnn/webstack-go" target="_blank">
-                        <i class="fa-github"></i> GitHub
-                    </a>
-                </li>
-            </ul>
-            <!-- <a href="https://github.com/WebStackPage/WebStackPage.github.io" target="_blank"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a> -->
-
-        </nav>
-        <!-- 搜索 -->
-        <section class="sousuo">
-            <div class="search">
-                <div class="search-box">
-                    <span class="search-icon"
-                          style="background: url(/assets/static/index/images/search_icon.png) 0px 0px; opacity: 1;"></span>
-                    <input type="text" id="txt" class="search-input" autocomplete="off" placeholder="请输入关键字，按回车 / Enter 搜索">
-                    <button class="search-btn" id="search-btn"><i class="fa fa-search"></i></button>
-                </div>
-                <!-- 搜索热词 -->
-                <div class="box search-hot-text" id="box" style="display: none;">
-                    <ul></ul>
-                </div>
-                <!-- 搜索引擎 -->
-                <div class="search-engine" style="display: none;">
-                    <div class="search-engine-head">
-                        <strong class="search-engine-tit">选择您的默认搜索引擎：</strong>
-                        <div class="search-engine-tool">
-                            搜索热词： <span id="hot-btn" style="background-image: url(/assets/bootstrap/images/index/off_on.png);"></span>
-                        </div>
-                    </div>
-                    <ul class="search-engine-list search-engine-list_zmki_ul">
-                    </ul>
-                </div>
-            </div>
-        </section>
-        <script>search('/assets/static/index/images/search_icon.png')</script>
-        <!-- 常用推荐 -->
-        {{ range .CategorySites }}
-        {{ if .SiteList }}
-        <h4 class="text-gray"><i class="linecons-tag" style="margin-right: 7px;" id="{{ .Category }}"></i>{{ .Category }}</h4>
-        <div class="row">
-            {{ range .SiteList }}
-            <div class="col-sm-3">
-                <div class="xe-widget xe-conversations box2 label-info" onclick="window.open('{{ .URL }}', '_blank')"
-                     data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{{ .Description }}">
-                    <div class="xe-comment-entry">
-                        <a class="xe-user-img">
-                            <img data-src="data:image/png;base64,{{ .Icon }}" class="lozad img-circle" width="40">
-                        </a>
-                        <div class="xe-comment">
-                            <a href="#" class="xe-user-name overflowClip_1">
-                                <strong>{{ .Title }}</strong>
-                            </a>
-                            <p class="overflowClip_2">{{ .Description }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {{ end }}
-        </div>
-        <br/>
+<header class="nav-header">
+    <div class="logo">
+        {{ if .ConfigSite.SiteLogo }}
+        <a href="/"><img src="data:image/png;base64,{{ .ConfigSite.SiteLogo }}" alt="{{ .ConfigSite.SiteCopyright }}"></a>
+        {{ else }}
+        <a href="/" style="font-weight:600;font-size:16px;color:var(--text-primary);text-decoration:none;">新疆幻城网安科技</a>
         {{ end }}
-        {{ end }}
-        <!-- END 常用推荐 -->
-        <footer class="main-footer sticky footer-type-1">
-            <div class="footer-inner">
-                <!-- Add your copyright text here -->
-                {{ if .ConfigSite.SiteRecord }}
-                <div class="footer-text">
-                   <a href="{{ .ConfigSite.SiteURL }}" target="_blank" rel="noopener noreferrer">
-                       <strong>{{ .ConfigSite.SiteRecord }}</strong>
-                   </a>
-                </div>
-                {{ else }}
-                <div class="footer-text">
-                    &copy; 2022-2025
-                    <a href="https://github.com/ch3nnn/webstack-go">
-                        <strong>WebStack-Go</strong>
-                    </a>
-                    design by
-                    <a href="https://blog.ch3nnn.cn/about/about/" target="_blank">
-                        <strong>Ch3nnn</strong>
-                    </a>
-                </div>
-                {{ end }}
-                <!-- Go to Top Link, just add rel="go-top" to any link to add this functionality -->
-                <div class="go-up">
-                    <a href="#" rel="go-top">
-                        <i class="fa-angle-up"></i>
-                    </a>
-                </div>
-            </div>
-        </footer>
     </div>
+    <nav class="nav-links" id="category-nav">
+        {{ range .CategoryTree }}
+        <a href="#cat-{{ .Name }}" class="smooth">{{ .Name }}</a>
+        {{ end }}
+    </nav>
+    <div class="nav-actions">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </button>
+        {{ if .About.IsAbout }}
+        <a href="/about" class="btn btn-ghost btn-sm">{{ index .Lang "about" }}</a>
+        {{ end }}
+        {{ if .ConfigSite.AllowSubmission }}
+        <a href="/submit" class="btn btn-secondary btn-sm">{{ index .Lang "submit_site" }}</a>
+        {{ end }}
+    </div>
+</header>
+
+<section class="hero-section">
+    <h1>{{ .ConfigSite.SiteTitle }}</h1>
+    <p>{{ .ConfigSite.SiteDesc }}</p>
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="{{ index .Lang "search_placeholder" }}" autocomplete="off">
+        <span class="search-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </span>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:24px;">
+        {{ range .CategoryTree }}
+        <a href="#cat-{{ .Name }}" class="filter-chip smooth">{{ .Name }}</a>
+        {{ end }}
+    </div>
+</section>
+
+<!-- 广告位：首页顶部 -->
+<div id="ad-homepage-top" style="max-width:1200px;margin:0 auto;padding:0 24px;"></div>
+
+<div class="sort-bar">
+    <span class="sort-label" id="site-count"></span>
+    <select id="sort-select" onchange="sortSites(this.value)">
+        <option value="default">{{ index .Lang "sort_default" }}</option>
+        <option value="rating-desc">{{ index .Lang "sort_rating_desc" }}</option>
+        <option value="rating-asc">{{ index .Lang "sort_rating_asc" }}</option>
+        <option value="reviews-desc">{{ index .Lang "sort_reviews_desc" }}</option>
+        <option value="newest">{{ index .Lang "sort_newest" }}</option>
+    </select>
 </div>
-<!-- 锚点平滑移动 -->
-<script type="text/javascript">
-    $(document).ready(function () {
-        //img lazy loaded
-        const observer = lozad();
-        observer.observe();
 
-        $(document).on('click', '.has-sub', function () {
-            var _this = $(this)
-            if (!$(this).hasClass('expanded')) {
-                setTimeout(function () {
-                    _this.find('ul').attr("style", "")
-                }, 300);
+{{ range .CategorySites }}
+{{ if .SiteList }}
+<h3 class="section-title" id="cat-{{ .Category }}">{{ .Category }}</h3>
+<div class="card-grid">
+    {{ range .SiteList }}
+    <div class="site-card" data-rating="{{ .AvgRating }}" data-reviews="{{ .ReviewCount }}" onclick="location.href='/site/{{ .ID }}'">
+        {{ if .IsFeatured }}<span class="badge-featured">{{ $.Lang.featured }}</span>{{ end }}
+        <button class="btn-visit" onclick="event.stopPropagation(); window.open('{{ .URL }}', '_blank')" title="Visit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </button>
+        <div class="card-header">
+            <div class="card-icon">
+                {{ if .Icon }}
+                <img src="data:image/png;base64,{{ .Icon }}" alt="{{ .Title }}" loading="lazy">
+                {{ else }}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/></svg>
+                {{ end }}
+            </div>
+            <div class="card-info">
+                <div class="card-title">{{ .Title }}</div>
+                <div class="card-desc">{{ .Description }}</div>
+            </div>
+        </div>
+        <div class="card-meta">
+            <div class="card-rating">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                {{ if .AvgRating }}<span>{{ printf "%.1f" .AvgRating }}</span>{{ else }}<span>--</span>{{ end }}
+                <span class="count">({{ .RatingCount }})</span>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}
+{{ end }}
 
-            } else {
-                $('.has-sub ul').each(function (id, ele) {
-                    const _that = $(this);
-                    if (_this.find('ul')[0] !== ele) {
-                        setTimeout(function () {
-                            _that.attr("style", "")
-                        }, 300);
-                    }
-                })
+<!-- 广告位：首页底部 -->
+<div id="ad-homepage-bottom" style="max-width:1200px;margin:0 auto;padding:24px;"></div>
+
+<footer class="site-footer">
+    {{ if .ConfigSite.FriendLinks }}
+    <div class="friend-links" style="text-align:center;margin-bottom:16px;padding:16px 0;border-top:1px solid var(--border-color);">
+        <span style="color:var(--text-secondary);font-weight:500;margin-right:8px;">友情链接：</span>
+        {{ range $i, $l := .ConfigSite.FriendLinks }}
+            {{ if $i }}<span style="margin:0 8px;color:var(--text-tertiary);">·</span>{{ end }}
+            <a href="{{ $l.URL }}" target="_blank" rel="noopener" title="{{ $l.Desc }}" style="color:var(--text-secondary);text-decoration:none;">{{ $l.Name }}</a>
+        {{ end }}
+    </div>
+    {{ end }}
+    <p style="text-align:center;margin:0;color:var(--text-tertiary);font-size:13px;">
+        &copy; 2024-2026 <a href="https://hcnsec.cn" target="_blank" rel="noopener" style="color:var(--text-secondary);text-decoration:none;">{{ .ConfigSite.SiteCopyright }}</a>
+        {{ if .ConfigSite.SiteRecord }} · <a href="{{ .ConfigSite.SiteURL }}" target="_blank" rel="noopener" style="color:var(--text-tertiary);">{{ .ConfigSite.SiteRecord }}</a>{{ end }}
+    </p>
+</footer>
+
+<script>
+var LANG = {{ .ConfigSite.SiteLang }};
+var LANG_DATA = {
+    api_providers_count: '{{ index .Lang "api_providers_count" }}',
+    my_account: '{{ index .Lang "my_account" }}'
+};
+function toggleTheme(){var h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n)}
+(function(){var s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark')})();
+document.getElementById('search-input').addEventListener('input',function(e){var q=e.target.value.toLowerCase();document.querySelectorAll('.site-card').forEach(function(c){var t=c.querySelector('.card-title').textContent.toLowerCase();var d=c.querySelector('.card-desc').textContent.toLowerCase();c.style.display=(t.includes(q)||d.includes(q))?'':'none'})});
+document.querySelectorAll('a.smooth,a.filter-chip').forEach(function(a){a.addEventListener('click',function(e){var href=decodeURI(this.getAttribute('href'));var t=document.querySelector(href);if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}})});
+function sortSites(m){document.querySelectorAll('.card-grid').forEach(function(g){var c=Array.from(g.children);c.sort(function(a,b){var ra=parseFloat(a.dataset.rating)||0,rb=parseFloat(b.dataset.rating)||0,rva=parseInt(a.dataset.reviews)||0,rvb=parseInt(b.dataset.reviews)||0;switch(m){case'rating-desc':return rb-ra;case'rating-asc':return ra-rb;case'reviews-desc':return rvb-rva;default:return 0}});c.forEach(function(x){g.appendChild(x)})})}
+var total=document.querySelectorAll('.site-card').length;document.getElementById('site-count').textContent=total+' '+LANG_DATA.api_providers_count;
+
+// 加载广告
+function loadAds(slot, containerId){
+    fetch('/api/ads?slot='+slot).then(r=>r.json()).then(d=>{
+        if(!d.list || !d.list.length) return;
+        var container = document.getElementById(containerId);
+        if(!container) return;
+        var html = '';
+        d.list.forEach(function(ad){
+            if(ad.content_type==='html'){
+                html += '<div class="ad-unit" style="margin-bottom:12px;">'+ad.content+'</div>';
+            } else if(ad.content_type==='image' && ad.image_url){
+                var link = ad.link_url ? '<a href="'+ad.link_url+'" target="_blank" rel="noopener"><img src="'+ad.image_url+'" style="max-width:100%;border-radius:var(--radius-md);" alt="'+escapeHtml(ad.name)+'"></a>' : '<img src="'+ad.image_url+'" style="max-width:100%;border-radius:var(--radius-md);" alt="'+escapeHtml(ad.name)+'">';
+                html += '<div class="ad-unit" style="margin-bottom:12px;">'+link+'</div>';
+            } else if(ad.content_type==='text'){
+                var link = ad.link_url ? '<a href="'+ad.link_url+'" target="_blank" rel="noopener" style="color:var(--accent);">'+escapeHtml(ad.content)+'</a>' : escapeHtml(ad.content);
+                html += '<div class="ad-unit" style="margin-bottom:12px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;color:var(--text-secondary);">'+link+'</div>';
             }
-        })
-        $('.user-info-menu .hidden-sm').click(function () {
-            if ($('.sidebar-menu').hasClass('collapsed')) {
-                $('.has-sub.expanded > ul').attr("style", "")
-            } else {
-                $('.has-sub.expanded > ul').show()
-            }
-        })
-        $("#main-menu li ul li").click(function () {
-            $(this).siblings('li').removeClass('active'); // 删除其他兄弟元素的样式
-            $(this).addClass('active'); // 添加当前元素的样式
         });
-        $("a.smooth").click(function (ev) {
-            ev.preventDefault();
-
-            public_vars.$mainMenu.add(public_vars.$sidebarProfile).toggleClass('mobile-is-visible');
-            ps_destroy();
-            $("html, body").animate({
-                scrollTop: $(decodeURI($(this).attr("href"))).offset().top - 30
-            }, {
-                duration: 500,
-                easing: "swing"
-            });
-        });
-        return false;
-    });
-
-    var href = "";
-    var pos = 0;
-    $("a.smooth").click(function (e) {
-        $("#main-menu li").each(function () {
-            $(this).removeClass("active");
-        });
-        $(this).parent("li").addClass("active");
-        e.preventDefault();
-        href = decodeURI($(this).attr("href"));
-        pos = $(href).position().top - 30;
-    });
+        container.innerHTML = html;
+    }).catch(function(){});
+}
+function escapeHtml(t){if(!t)return'';return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+loadAds('homepage_top','ad-homepage-top');
+loadAds('homepage_bottom','ad-homepage-bottom');
 </script>
-<!-- Bottom Scripts -->
-<script src="assets/static/index/js/bootstrap.min.js"></script>
-<script src="assets/static/index/js/TweenMax.min.js"></script>
-<script src="assets/static/index/js/resizeable.js"></script>
-<script src="assets/static/index/js/joinable.js"></script>
-<script src="assets/static/index/js/xenon-api.js"></script>
-<script src="assets/static/index/js/xenon-toggles.js"></script>
-<!-- JavaScripts initializations and stuff -->
-<script src="assets/static/index/js/xenon-custom.js"></script>
-<script src="assets/static/index/js/lozad.js"></script>
 </body>
 </html>

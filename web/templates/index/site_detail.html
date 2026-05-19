@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站详情</title>
+    <link rel="stylesheet" href="/assets/static/index/css/apple-design.css">
+    <style>
+        .detail-page { max-width: 900px; margin: 0 auto; padding: calc(var(--header-height) + 32px) 24px 60px; }
+        .detail-header { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 32px; }
+        .detail-icon { width: 80px; height: 80px; border-radius: var(--radius-lg); background: var(--bg-input); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .detail-icon img { width: 100%; height: 100%; object-fit: contain; }
+        .detail-title { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+        .detail-url { font-size: 14px; color: var(--accent); margin-top: 4px; word-break: break-all; }
+        .detail-desc { font-size: 15px; color: var(--text-secondary); margin-top: 8px; }
+        .detail-badges { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .detail-badge { padding: 4px 12px; border-radius: var(--radius-full); font-size: 12px; font-weight: 500; }
+        .detail-actions { display: flex; gap: 12px; margin: 24px 0; }
+
+        .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+        .tab { padding: 12px 20px; font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; transition: all var(--transition-fast); }
+        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab:hover { color: var(--text-primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .content-md { line-height: 1.8; font-size: 15px; color: var(--text-primary); }
+        .content-md h1,.content-md h2,.content-md h3 { margin: 24px 0 12px; font-weight: 600; }
+        .content-md p { margin-bottom: 12px; }
+        .content-md code { background: var(--bg-input); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+
+        .pricing-table { width: 100%; border-collapse: collapse; }
+        .pricing-table th,.pricing-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .pricing-table th { font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .model-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+        .model-chip { padding: 6px 14px; border-radius: var(--radius-full); background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 500; }
+
+        .health-bar { display: flex; gap: 24px; margin: 16px 0; }
+        .health-item { text-align: center; }
+        .health-value { font-size: 28px; font-weight: 700; }
+        .health-label { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+        .health-online { color: var(--success); }
+        .health-offline { color: var(--danger); }
+
+        .rating-summary { display: flex; align-items: center; gap: 16px; margin: 24px 0; padding: 20px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); }
+        .rating-big { font-size: 48px; font-weight: 700; color: var(--star); }
+        .rating-stars-interactive { display: flex; gap: 4px; margin: 16px 0; }
+        .rating-stars-interactive .star-btn { width: 36px; height: 36px; font-size: 24px; background: none; border: none; cursor: pointer; color: var(--border); transition: color var(--transition-fast); }
+        .rating-stars-interactive .star-btn.filled { color: var(--star); }
+        .rating-stars-interactive .star-btn:hover { color: var(--star); }
+
+        .review-form { margin: 24px 0; }
+        .review-form textarea { width: 100%; min-height: 100px; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; font-family: var(--font-sans); font-size: 14px; resize: vertical; background: var(--bg-card); color: var(--text-primary); }
+        .review-form textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-light); }
+        .review-form input { width: 100%; height: 44px; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0 14px; font-size: 15px; background: var(--bg-input); color: var(--text-primary); margin-bottom: 12px; }
+        .review-form input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-light); }
+
+        .review-list { margin-top: 24px; }
+        .review-item { padding: 16px 0; border-bottom: 1px solid var(--border); }
+        .review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .review-avatar { width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: var(--accent); }
+        .review-author { font-size: 14px; font-weight: 600; }
+        .review-date { font-size: 12px; color: var(--text-tertiary); }
+        .review-content { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+        .screenshots { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 16px 0; }
+        .screenshots img { width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+<header class="nav-header">
+    <div class="logo"><a href="/"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></a></div>
+    <nav class="nav-links"><a href="/">首页</a></nav>
+    <div class="nav-actions">
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </button>
+    </div>
+</header>
+
+<div class="detail-page" id="detail-page">
+    <div style="text-align:center;padding:60px;color:var(--text-tertiary)">加载中...</div>
+</div>
+
+<!-- 广告位：详情页底部 -->
+<div id="ad-site-detail-bottom" style="max-width:900px;margin:0 auto;padding:0 24px 24px;"></div>
+
+<footer class="site-footer"><p>&copy; 2024-2026 <a href="https://hcnsec.cn" target="_blank" rel="noopener">新疆幻城网安科技有限责任公司</a></p></footer>
+
+<script>
+function toggleTheme(){var h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n)}
+(function(){var s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark')})();
+
+var siteId = window.location.pathname.split('/').pop();
+var siteConfig = {};
+
+// Load site config first to check permissions and copyright
+fetch('/api/site-config').then(r=>r.json()).then(c => {
+    siteConfig = c;
+    if(c.site_copyright) {
+        var footer = document.querySelector('.site-footer a');
+        if(footer) footer.textContent = c.site_copyright;
+    }
+});
+
+fetch('/api/sites/' + siteId)
+.then(r => r.json())
+.then(data => {
+    var s = data;
+    document.title = s.title + ' - 详情';
+    var html = '<div class="detail-header">';
+    html += '<div class="detail-icon">';
+    if(s.icon) html += '<img src="data:image/png;base64,' + s.icon + '" alt="">';
+    html += '</div><div>';
+    html += '<div class="detail-title">' + s.title + '</div>';
+    html += '<div class="detail-url"><a href="' + s.url + '" target="_blank">' + s.url + '</a></div>';
+    html += '<div class="detail-desc">' + (s.description||'') + '</div>';
+    html += '<div class="detail-badges">';
+    if(s.tags) s.tags.forEach(t => { html += '<span class="detail-badge" style="background:'+t.color+'20;color:'+t.color+'">' + t.name + '</span>'; });
+    if(s.is_featured) html += '<span class="detail-badge" style="background:var(--accent-light);color:var(--accent)">精选</span>';
+    if(s.is_recommended) html += '<span class="detail-badge" style="background:#34c75920;color:#34c759">推荐</span>';
+    html += '</div></div></div>';
+
+    html += '<div class="detail-actions">';
+    html += '<a href="' + s.url + '" target="_blank" class="btn btn-primary">访问网站</a>';
+    html += '<span class="btn btn-secondary">' + s.view_count + ' 次浏览</span>';
+    html += '</div>';
+
+    // Tabs
+    html += '<div class="tabs">';
+    html += '<div class="tab active" data-tab="overview" onclick="showTab(\'overview\')">概览</div>';
+    html += '<div class="tab" data-tab="pricing" onclick="showTab(\'pricing\')">定价</div>';
+    html += '<div class="tab" data-tab="reviews" onclick="showTab(\'reviews\')">评论 (' + (s.review_count||0) + ')</div>';
+    html += '</div>';
+
+    // Overview tab
+    html += '<div class="tab-content active" id="tab-overview">';
+    if(s.health_status) {
+        html += '<h4 style="margin-bottom:12px;font-weight:600">运行状态</h4>';
+        html += '<div class="health-bar">';
+        html += '<div class="health-item"><div class="health-value ' + (s.health_status.is_online?'health-online':'health-offline') + '">' + (s.health_status.is_online?'在线':'离线') + '</div><div class="health-label">状态</div></div>';
+        html += '<div class="health-item"><div class="health-value">' + (s.health_status.uptime_7d||0).toFixed(1) + '%</div><div class="health-label">7天可用率</div></div>';
+        html += '<div class="health-item"><div class="health-value">' + (s.health_status.avg_latency_ms||0) + 'ms</div><div class="health-label">平均延迟</div></div>';
+        html += '</div>';
+    }
+    if(s.supported_models && s.supported_models.length) {
+        html += '<h4 style="margin:24px 0 12px;font-weight:600">支持的模型</h4>';
+        html += '<div class="model-chips">';
+        s.supported_models.forEach(m => { html += '<span class="model-chip">' + m.name + (m.provider?' ('+m.provider+')':'') + '</span>'; });
+        html += '</div>';
+    }
+    if(s.content) {
+        html += '<h4 style="margin:24px 0 12px;font-weight:600">详细介绍</h4>';
+        html += '<div class="content-md">' + s.content + '</div>';
+    }
+    if(s.screenshots && s.screenshots.length) {
+        html += '<h4 style="margin:24px 0 12px;font-weight:600">截图</h4>';
+        html += '<div class="screenshots">';
+        s.screenshots.forEach(src => { html += '<img src="' + src + '" alt="截图" loading="lazy">'; });
+        html += '</div>';
+    }
+    html += '</div>';
+
+    // Pricing tab
+    html += '<div class="tab-content" id="tab-pricing">';
+    if(s.pricing_info) {
+        html += '<table class="pricing-table"><tbody>';
+        if(s.pricing_info.rate_multiplier) html += '<tr><th>倍率</th><td>' + s.pricing_info.rate_multiplier + 'x</td></tr>';
+        if(s.pricing_info.min_charge) html += '<tr><th>最低充值</th><td>$' + s.pricing_info.min_charge + '</td></tr>';
+        if(s.pricing_info.pricing_note) html += '<tr><th>备注</th><td>' + s.pricing_info.pricing_note + '</td></tr>';
+        html += '</tbody></table>';
+    }
+    if(s.payment_methods && s.payment_methods.length) {
+        html += '<h4 style="margin:24px 0 12px;font-weight:600">支付方式</h4>';
+        html += '<div class="model-chips">';
+        s.payment_methods.forEach(p => { html += '<span class="model-chip">' + p.name + '</span>'; });
+        html += '</div>';
+    }
+    if(!s.pricing_info && (!s.payment_methods||!s.payment_methods.length)) {
+        html += '<p style="color:var(--text-tertiary);padding:40px;text-align:center">暂无定价信息</p>';
+    }
+    html += '</div>';
+
+    // Reviews tab
+    html += '<div class="tab-content" id="tab-reviews">';
+    html += '<div class="rating-summary">';
+    html += '<div class="rating-big">' + (s.avg_rating ? s.avg_rating.toFixed(1) : '--') + '</div>';
+    html += '<div><div style="color:var(--star)">';
+    for(var i=1;i<=5;i++) html += (i<=Math.round(s.avg_rating||0)) ? '★' : '☆';
+    html += '</div><div style="font-size:13px;color:var(--text-tertiary)">' + (s.rating_count||0) + ' 个评分</div></div>';
+    html += '</div>';
+
+    // Anonymous rating (if allowed)
+    if(siteConfig.allow_anonymous_rating) {
+        html += '<h4 style="margin:24px 0 8px;font-weight:600">为此服务商评分</h4>';
+        html += '<div class="rating-stars-interactive" id="rate-stars">';
+        for(var i=1;i<=5;i++) html += '<button class="star-btn" data-score="'+i+'" onclick="submitRating('+i+')">★</button>';
+        html += '</div>';
+    }
+
+    // Anonymous review (if allowed)
+    if(siteConfig.allow_anonymous_review) {
+        html += '<h4 style="margin:24px 0 8px;font-weight:600">写评论</h4>';
+        html += '<div class="review-form">';
+        html += '<input type="text" id="review-nickname" placeholder="你的昵称（可选）" maxlength="50">';
+        html += '<textarea id="review-text" placeholder="分享你的使用体验（至少10个字）..."></textarea><br>';
+        html += '<button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="submitReview()">提交评论</button>';
+        html += '</div>';
+    }
+
+    html += '<div class="review-list" id="review-list"><p style="text-align:center;color:var(--text-tertiary)">加载评论中...</p></div>';
+    html += '</div>';
+
+    document.getElementById('detail-page').innerHTML = html;
+    loadReviews();
+});
+
+function showTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-tab') === name));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+}
+
+function submitRating(score) {
+    fetch('/api/sites/' + siteId + '/rating', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({score:score}) })
+    .then(r=>r.json()).then(d => {
+        if(d.avg_rating !== undefined) {
+            document.querySelectorAll('#rate-stars .star-btn').forEach((b,i) => b.classList.toggle('filled', i<score));
+        } else {
+            alert(d.message || '评分功能暂不可用');
+        }
+    });
+}
+
+function submitReview() {
+    var text = document.getElementById('review-text').value;
+    if(text.length < 10) { alert('评论至少需要10个字符'); return; }
+    var nickname = document.getElementById('review-nickname') ? document.getElementById('review-nickname').value : '';
+    fetch('/api/sites/' + siteId + '/review', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({content:text, nickname:nickname}) })
+    .then(r=>r.json()).then(d => {
+        if(d.id) {
+            document.getElementById('review-text').value = '';
+            alert(d.message || '评论已提交，审核通过后将显示');
+        } else {
+            alert(d.message || '评论功能暂不可用');
+        }
+    });
+}
+
+function loadReviews() {
+    fetch('/api/sites/' + siteId + '/reviews').then(r=>r.json()).then(d => {
+        var el = document.getElementById('review-list');
+        if(!d.list || !d.list.length) { el.innerHTML = '<p style="text-align:center;color:var(--text-tertiary);padding:20px">暂无评论，来做第一个评价的人吧！</p>'; return; }
+        var html = '';
+        d.list.forEach(r => {
+            html += '<div class="review-item"><div class="review-header">';
+            html += '<div class="review-avatar">' + (r.nickname||'U').charAt(0).toUpperCase() + '</div>';
+            html += '<span class="review-author">' + (r.nickname||'匿名用户') + '</span>';
+            html += '<span class="review-date">' + r.created_at + '</span>';
+            html += '</div><div class="review-content">' + r.content + '</div></div>';
+        });
+        el.innerHTML = html;
+    });
+}
+
+// 加载广告
+function loadAds(slot, containerId){
+    fetch('/api/ads?slot='+slot).then(r=>r.json()).then(d=>{
+        if(!d.list || !d.list.length) return;
+        var container = document.getElementById(containerId);
+        if(!container) return;
+        var html = '';
+        d.list.forEach(function(ad){
+            if(ad.content_type==='html'){
+                html += '<div class="ad-unit" style="margin-bottom:12px;">'+ad.content+'</div>';
+            } else if(ad.content_type==='image' && ad.image_url){
+                var link = ad.link_url ? '<a href="'+ad.link_url+'" target="_blank" rel="noopener"><img src="'+ad.image_url+'" style="max-width:100%;border-radius:8px;" alt="'+escapeHtml(ad.name)+'"></a>' : '<img src="'+ad.image_url+'" style="max-width:100%;border-radius:8px;" alt="'+escapeHtml(ad.name)+'">';
+                html += '<div class="ad-unit" style="margin-bottom:12px;">'+link+'</div>';
+            } else if(ad.content_type==='text'){
+                var link = ad.link_url ? '<a href="'+ad.link_url+'" target="_blank" rel="noopener" style="color:var(--accent);">'+escapeHtml(ad.content)+'</a>' : escapeHtml(ad.content);
+                html += '<div class="ad-unit" style="margin-bottom:12px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text-secondary);">'+link+'</div>';
+            }
+        });
+        container.innerHTML = html;
+    }).catch(function(){});
+}
+function escapeHtml(t){if(!t)return'';return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+loadAds('site_detail_bottom','ad-site-detail-bottom');
+</script>
+</body>
+</html>
