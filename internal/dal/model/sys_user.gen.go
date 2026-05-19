@@ -18,6 +18,16 @@ type SysUser struct {
 	CreatedAt *time.Time `gorm:"column:created_at;type:datetime;not null;default:CURRENT_TIMESTAMP not null" json:"created_at"`
 	UpdatedAt *time.Time `gorm:"column:updated_at;type:datetime;not null;default:CURRENT_TIMESTAMP not null" json:"updated_at"`
 	DeletedAt *time.Time `gorm:"column:deleted_at;type:datetime" json:"deleted_at"`
+
+	Email             string     `gorm:"column:email;type:varchar(255)" json:"email"`
+	EmailVerified     bool       `gorm:"column:email_verified;type:bool;default:false" json:"email_verified"`
+	Nickname          string     `gorm:"column:nickname;type:varchar(50)" json:"nickname"`
+	Avatar            string     `gorm:"column:avatar;type:text" json:"avatar"`
+	Role              string     `gorm:"column:role;type:varchar(20);default:'user'" json:"role"`
+	Status            string     `gorm:"column:status;type:varchar(20);default:'active'" json:"status"`
+	LastLoginAt       *time.Time `gorm:"column:last_login_at;type:datetime" json:"last_login_at"`
+	VerificationToken string     `gorm:"column:verification_token;type:varchar(255)" json:"-"`
+	TokenExpiresAt    *time.Time `gorm:"column:token_expires_at;type:datetime" json:"-"`
 }
 
 // TableName SysUser's table name

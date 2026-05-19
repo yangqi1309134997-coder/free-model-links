@@ -27,21 +27,40 @@ type About struct {
 	IsAbout     bool   `json:"is_about"`     // 是否开启关于
 }
 
+type FriendLink struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+	Desc string `json:"desc,omitempty"`
+}
+
 type ConfigSite struct {
-	SiteTitle   string `json:"site_title"`   // 站点标题
-	SiteKeyword string `json:"site_keyword"` // 站点关键字
-	SiteDesc    string `json:"site_desc"`    // 站点描述
-	SiteRecord  string `json:"site_record"`  // 站点备案
-	SiteURL     string `json:"site_url"`     // 备案url
-	SiteLogo    string `json:"site_logo"`    // 站点logo
-	SiteFavicon string `json:"site_favicon"` // 站点favicon
+	SiteTitle   string `json:"site_title"`
+	SiteKeyword string `json:"site_keyword"`
+	SiteDesc    string `json:"site_desc"`
+	SiteRecord  string `json:"site_record"`
+	SiteURL     string `json:"site_url"`
+	SiteLogo    string `json:"site_logo"`
+	SiteFavicon string `json:"site_favicon"`
+	SiteLang    string `json:"site_lang"`
+	AllowAnonymousRating  bool `json:"allow_anonymous_rating"`
+	AllowAnonymousReview  bool `json:"allow_anonymous_review"`
+	AllowSubmission       bool `json:"allow_submission"`
+	// SEO 扩展
+	SeoAuthor       string       `json:"seo_author"`
+	SeoOgImage      string       `json:"seo_og_image"`
+	SeoTwitterCard  string       `json:"seo_twitter_card"`
+	SeoCanonicalURL string       `json:"seo_canonical_url"`
+	SeoRobots       string       `json:"seo_robots"`
+	FriendLinks     []FriendLink `json:"friend_links"`
+	SiteCopyright   string       `json:"site_copyright"`
 }
 
 type IndexResp struct {
-	About         *About          // 关于页面
-	ConfigSite    *ConfigSite     // 站点配置
-	CategoryTree  []*TreeNode     // 分类树
-	CategorySites []*CategorySite // 归类站点数据
+	About         *About
+	ConfigSite    *ConfigSite
+	CategoryTree  []*TreeNode
+	CategorySites []*CategorySite
+	Lang          map[string]string
 }
 
 type AboutResp struct {

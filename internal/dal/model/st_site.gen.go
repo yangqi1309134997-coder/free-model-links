@@ -23,6 +23,18 @@ type StSite struct {
 	UpdatedAt   *time.Time `gorm:"column:updated_at;type:datetime;not null;default:CURRENT_TIMESTAMP not null" json:"updated_at"`
 	DeletedAt   *time.Time `gorm:"column:deleted_at;type:datetime" json:"deleted_at"`
 	Sort        int        `gorm:"column:sort;type:int(11)" json:"sort"`
+
+	Content         string  `gorm:"column:content;type:text" json:"content"`
+	Screenshots     string  `gorm:"column:screenshots;type:text" json:"screenshots"`
+	PricingInfo     string  `gorm:"column:pricing_info;type:text" json:"pricing_info"`
+	SupportedModels string  `gorm:"column:supported_models;type:text" json:"supported_models"`
+	HealthStatus    string  `gorm:"column:health_status;type:text" json:"health_status"`
+	IsFeatured      bool    `gorm:"column:is_featured;type:bool;default:false" json:"is_featured"`
+	IsRecommended   bool    `gorm:"column:is_recommended;type:bool;default:false" json:"is_recommended"`
+	AvgRating       float64 `gorm:"column:avg_rating;type:real;default:0" json:"avg_rating"`
+	RatingCount     int     `gorm:"column:rating_count;type:int(11);default:0" json:"rating_count"`
+	ReviewCount     int     `gorm:"column:review_count;type:int(11);default:0" json:"review_count"`
+	ViewCount       int     `gorm:"column:view_count;type:int(11);default:0" json:"view_count"`
 }
 
 // TableName StSite's table name

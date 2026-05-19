@@ -11,6 +11,7 @@ import (
 	"encoding/base64"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,18 @@ import (
 	s "github.com/ch3nnn/webstack-go/internal/service"
 	"github.com/ch3nnn/webstack-go/pkg/tools"
 )
+
+// normalizeURL ensures the URL has a scheme; defaults to https if missing.
+func normalizeURL(u string) string {
+	u = strings.TrimSpace(u)
+	if u == "" {
+		return u
+	}
+	if !strings.HasPrefix(u, "http://") && !strings.HasPrefix(u, "https://") {
+		return "https://" + u
+	}
+	return u
+}
 
 // Service 层
 var _ Service = (*service)(nil)
@@ -67,8 +80,9 @@ func (s *service) i() {}
 // -----------------------------------------------------------------------------------------------------------------------------------------
 
 func getWebLogoIconBase64(url string) (string, error) {
+	url = normalizeURL(url)
 	client := &http.Client{
-		Timeout: 3 * time.Second,
+		Timeout: 10 * time.Second,
 		Transport: tools.NewHTTPTransport(&http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}),
@@ -93,9 +107,18 @@ func getWebLogoIconBase64(url string) (string, error) {
 }
 
 func getWebTitle(url string) (title string, err error) {
+	url = normalizeURL(url)
 	c := tools.NewColly()
 	c.OnHTML("title", func(e *colly.HTMLElement) {
-		title += e.Text
+		if title == "" {
+			title = strings.TrimSpace(e.Text)
+		}
+	})
+	// fallback to og:title
+	c.OnHTML("meta[property='og:title']", func(e *colly.HTMLElement) {
+		if title == "" {
+			title = strings.TrimSpace(e.Attr("content"))
+		}
 	})
 	if err := c.Visit(url); err != nil {
 		return "", err
@@ -105,12 +128,29 @@ func getWebTitle(url string) (title string, err error) {
 }
 
 func getWebDescription(url string) (doc string, err error) {
+	url = normalizeURL(url)
 	c := tools.NewColly()
-	c.OnXML("//meta[@name='description']/@content|//meta[@name='Description']/@content|//meta[@name='DESCRIPTION']",
-		func(e *colly.XMLElement) {
-			doc += e.Text
-		},
-	)
+	// 兼容多种 description meta 写法
+	c.OnHTML("meta[name='description']", func(e *colly.HTMLElement) {
+		if doc == "" {
+			doc = strings.TrimSpace(e.Attr("content"))
+		}
+	})
+	c.OnHTML("meta[name='Description']", func(e *colly.HTMLElement) {
+		if doc == "" {
+			doc = strings.TrimSpace(e.Attr("content"))
+		}
+	})
+	c.OnHTML("meta[property='og:description']", func(e *colly.HTMLElement) {
+		if doc == "" {
+			doc = strings.TrimSpace(e.Attr("content"))
+		}
+	})
+	c.OnHTML("meta[name='twitter:description']", func(e *colly.HTMLElement) {
+		if doc == "" {
+			doc = strings.TrimSpace(e.Attr("content"))
+		}
+	})
 	if err := c.Visit(url); err != nil {
 		return "", err
 	}

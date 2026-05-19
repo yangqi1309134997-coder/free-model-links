@@ -13,12 +13,17 @@ import (
 )
 
 func (s *service) Create(ctx context.Context, req *v1.CategoryCreateReq) (*v1.CategoryCreateResp, error) {
+	level := int32(2)
+	if req.ParentID == 0 {
+		level = 1
+	}
+
 	category, err := s.categoryRepo.WithContext(ctx).
 		Create(&model.StCategory{
 			ParentID: req.ParentID,
 			Title:    req.Name,
 			Icon:     req.Icon,
-			Level:    req.Level,
+			Level:    level,
 			IsUsed:   req.IsUsed,
 			Sort:     req.SortID,
 		})

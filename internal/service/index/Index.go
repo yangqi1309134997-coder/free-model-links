@@ -7,6 +7,7 @@ package index
 
 import (
 	"context"
+	"encoding/json"
 	"sort"
 
 	"golang.org/x/sync/errgroup"
@@ -14,6 +15,7 @@ import (
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/internal/dal/model"
 	"github.com/ch3nnn/webstack-go/internal/dal/query"
+	"github.com/ch3nnn/webstack-go/internal/i18n"
 )
 
 // buildTree 构建树形结构
@@ -115,15 +117,39 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResp, error) {
 	categoryTree := categoryTree(buildTree(nodes, 0))
 	categorySites := categorySites(sites, categoryTree)
 
+	// 解析友情链接 JSON
+	var friendLinks []v1.FriendLink
+	if sysConfig.FriendLinks != "" {
+		_ = json.Unmarshal([]byte(sysConfig.FriendLinks), &friendLinks)
+	}
+	// 若数据库为空则提供默认友情链接
+	if len(friendLinks) == 0 {
+		friendLinks = []v1.FriendLink{
+			{Name: "幻城网安科技", URL: "https://hcnsec.cn", Desc: "新疆幻城网安科技有限责任公司官网"},
+			{Name: "公益大模型 API 分发", URL: "https://api.iamhc.cn", Desc: "公益大模型 API 分发平台"},
+		}
+	}
+
 	return &v1.IndexResp{
 		ConfigSite: &v1.ConfigSite{
-			SiteTitle:   sysConfig.SiteTitle,
-			SiteKeyword: sysConfig.SiteKeyword,
-			SiteDesc:    sysConfig.SiteDesc,
-			SiteRecord:  sysConfig.SiteRecord,
-			SiteURL:     sysConfig.SiteURL,
-			SiteLogo:    sysConfig.SiteLogo,
-			SiteFavicon: sysConfig.SiteFavicon,
+			SiteTitle:             sysConfig.SiteTitle,
+			SiteKeyword:           sysConfig.SiteKeyword,
+			SiteDesc:              sysConfig.SiteDesc,
+			SiteRecord:            sysConfig.SiteRecord,
+			SiteURL:               sysConfig.SiteURL,
+			SiteLogo:              sysConfig.SiteLogo,
+			SiteFavicon:           sysConfig.SiteFavicon,
+			SiteLang:              sysConfig.SiteLang,
+			AllowAnonymousRating:  sysConfig.AllowAnonymousRating,
+			AllowAnonymousReview:  sysConfig.AllowAnonymousReview,
+			AllowSubmission:       sysConfig.AllowSubmission,
+			SeoAuthor:             sysConfig.SeoAuthor,
+			SeoOgImage:            sysConfig.SeoOgImage,
+			SeoTwitterCard:        sysConfig.SeoTwitterCard,
+			SeoCanonicalURL:       sysConfig.SeoCanonicalURL,
+			SeoRobots:             sysConfig.SeoRobots,
+			FriendLinks:           friendLinks,
+			SiteCopyright:         sysConfig.SiteCopyright,
 		},
 		About: &v1.About{
 			AboutSite:   sysConfig.AboutSite,
@@ -132,5 +158,17 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResp, error) {
 		},
 		CategoryTree:  categoryTree,
 		CategorySites: categorySites,
+		Lang:          buildLangMap(sysConfig.SiteLang),
 	}, nil
+}
+
+func buildLangMap(lang string) map[string]string {
+	if lang == "" {
+		lang = "zh"
+	}
+	m := make(map[string]string)
+	for key := range i18n.Translations {
+		m[key] = i18n.T(key, lang)
+	}
+	return m
 }

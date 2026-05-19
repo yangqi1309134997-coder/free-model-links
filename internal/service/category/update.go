@@ -19,6 +19,12 @@ func (s *service) Update(ctx context.Context, req *v1.CategoryUpdateReq) (*v1.Ca
 	if req.Pid != nil {
 		column := gormx.ColumnName(query.StCategory.ParentID)
 		update[column] = req.Pid
+		levelColumn := gormx.ColumnName(query.StCategory.Level)
+		if *req.Pid == 0 {
+			update[levelColumn] = int32(1)
+		} else {
+			update[levelColumn] = int32(2)
+		}
 	}
 	if req.Icon != nil {
 		column := gormx.ColumnName(query.StCategory.Icon)

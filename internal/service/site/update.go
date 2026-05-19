@@ -6,9 +6,14 @@
 package site
 
 import (
+	"encoding/json"
+	"strconv"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
+	"github.com/ch3nnn/webstack-go/internal/dal/model"
 	"github.com/ch3nnn/webstack-go/internal/dal/query"
 	"github.com/ch3nnn/webstack-go/internal/dal/repository"
 	"github.com/ch3nnn/webstack-go/pkg/gormx"
@@ -69,6 +74,43 @@ func (s *service) Update(ctx *gin.Context, req *v1.SiteUpdateReq) (resp *v1.Site
 	_, err = s.siteRepository.WithContext(ctx).Update(update, s.siteRepository.WhereByID(req.Id))
 	if err != nil {
 		return nil, err
+	}
+
+	db := query.StSite.WithContext(ctx.Request.Context()).UnderlyingDB()
+
+	// Update tag associations
+	if req.TagIDs != "" {
+		db.Where("site_id = ?", req.Id).Delete(&model.StSiteTag{})
+		for _, idStr := range strings.Split(req.TagIDs, ",") {
+			tagID, _ := strconv.Atoi(strings.TrimSpace(idStr))
+			if tagID > 0 {
+				db.Table("st_site_tag").Create(&map[string]interface{}{"site_id": req.Id, "tag_id": tagID})
+			}
+		}
+	}
+
+	// Update model associations (stored as JSON in supported_models column)
+	if req.ModelIDs != "" {
+		var modelIDs []int
+		for _, idStr := range strings.Split(req.ModelIDs, ",") {
+			mid, _ := strconv.Atoi(strings.TrimSpace(idStr))
+			if mid > 0 {
+				modelIDs = append(modelIDs, mid)
+			}
+		}
+		jsonData, _ := json.Marshal(modelIDs)
+		db.Table("st_site").Where("id = ?", req.Id).Update("supported_models", string(jsonData))
+	}
+
+	// Update payment method associations
+	if req.PaymentMethodIDs != "" {
+		db.Where("site_id = ?", req.Id).Delete(&model.StSitePayment{})
+		for _, idStr := range strings.Split(req.PaymentMethodIDs, ",") {
+			pmID, _ := strconv.Atoi(strings.TrimSpace(idStr))
+			if pmID > 0 {
+				db.Table("st_site_payment").Create(&map[string]interface{}{"site_id": req.Id, "payment_method_id": pmID})
+			}
+		}
 	}
 
 	return &v1.SiteUpdateResp{ID: req.Id}, nil
