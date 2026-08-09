@@ -60,6 +60,27 @@ func (s *service) Update(ctx *gin.Context, req *v1.ConfigUpdateReq) (resp *v1.Co
 		column := gormx.ColumnName(query.SysConfig.IsAbout)
 		update[column] = *req.IsAbout
 	}
+	// SEO 扩展字段
+	if req.SeoAuthor != nil {
+		column := gormx.ColumnName(query.SysConfig.SeoAuthor)
+		update[column] = *req.SeoAuthor
+	}
+	if req.SeoOgImage != nil {
+		column := gormx.ColumnName(query.SysConfig.SeoOgImage)
+		update[column] = *req.SeoOgImage
+	}
+	if req.SeoTwitterCard != nil {
+		column := gormx.ColumnName(query.SysConfig.SeoTwitterCard)
+		update[column] = *req.SeoTwitterCard
+	}
+	if req.SeoCanonicalURL != nil {
+		column := gormx.ColumnName(query.SysConfig.SeoCanonicalURL)
+		update[column] = *req.SeoCanonicalURL
+	}
+	if req.SeoRobots != nil {
+		column := gormx.ColumnName(query.SysConfig.SeoRobots)
+		update[column] = *req.SeoRobots
+	}
 	if req.LogoFile != nil && req.LogoFile.Size > 0 {
 		base64Str, err := tools.ResizeMultipartImgToBase64(req.LogoFile, LogoWidth, LogoHeight)
 		if err != nil {

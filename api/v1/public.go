@@ -83,6 +83,8 @@ type (
 		ID    int    `json:"id"`
 		Name  string `json:"name"`
 		Color string `json:"color"`
+		Sort  int    `json:"sort"`
+		IsUsed bool  `json:"is_used"`
 	}
 
 	SitePaymentInfo struct {

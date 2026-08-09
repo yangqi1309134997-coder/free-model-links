@@ -4,3 +4,4 @@ storage/logs
 *.log
 deploy/docker-compose/conf
 deploy/docker-compose/data
+sandbox-db/

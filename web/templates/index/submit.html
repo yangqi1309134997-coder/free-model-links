@@ -41,6 +41,16 @@
                 <textarea id="description" placeholder="简单介绍一下这个网站..."></textarea>
             </div>
             <div class="form-group">
+                <label>Logo 地址（可选）</label>
+                <input type="url" id="icon" placeholder="https://example.com/logo.png">
+            </div>
+            <div class="form-group">
+                <label>所属分类</label>
+                <select id="category" style="width:100%;height:44px;border:1px solid var(--border);border-radius:var(--radius-md);padding:0 14px;font-size:15px;background:var(--bg-input);color:var(--text-primary);">
+                    <option value="0">暂不选择</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label>联系方式（可选）</label>
                 <input type="text" id="contact" placeholder="邮箱或其他联系方式">
             </div>
@@ -57,7 +67,14 @@
 (function(){var s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s)})();
 function doSubmit(e) {
     e.preventDefault();
-    var data = { url: document.getElementById('url').value, title: document.getElementById('title').value, description: document.getElementById('description').value, contact: document.getElementById('contact').value };
+    var data = {
+        url: document.getElementById('url').value,
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        contact: document.getElementById('contact').value,
+        icon: document.getElementById('icon').value,
+        category_id: parseInt(document.getElementById('category').value)||0
+    };
     fetch('/api/submissions', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) })
     .then(r => r.json()).then(d => {
         var m = document.getElementById('msg');
@@ -67,6 +84,26 @@ function doSubmit(e) {
     }).catch(() => { var m=document.getElementById('msg'); m.style.display='block'; m.className='msg msg-error'; m.textContent='网络错误'; });
     return false;
 }
+
+// 加载分类树（一级 + 二级）
+function loadCategories(){
+    fetch('/api/categories').then(r=>r.json()).then(d=>{
+        var sel=document.getElementById('category');
+        var flat=[];
+        (d.categories||d.list||[]).forEach(function(c){
+            if(c.level===1){ flat.push({id:c.id,name:c.name,level:1}); }
+            if(c.children){ c.children.forEach(function(child){ flat.push({id:child.id,name:child.name,level:2}); }); }
+        });
+        if(!flat.length){ flat=(d.list||[]).map(function(c){return{id:c.id,name:c.name,level:1};}); }
+        flat.forEach(function(c){
+            var o=document.createElement('option');
+            o.value=c.id;
+            o.textContent=(c.level===2?'　├ ':'')+c.name;
+            sel.appendChild(o);
+        });
+    }).catch(function(){});
+}
+loadCategories();
 
 // 加载广告
 function loadAds(slot, containerId){

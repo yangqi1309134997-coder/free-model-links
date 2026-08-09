@@ -1,10 +1,27 @@
-# API 服务商导航平台
+# AI 大模型 API 导航站
 
-基于 [webstack-go](https://github.com/ch3nnn/webstack-go) 深度定制开发的 **AI / LLM API 服务商导航平台**，专为聚合、展示和评价大模型 API 中转服务商而设计。由 **新疆幻城网安科技有限责任公司** 维护运营。
+基于 [webstack-go](https://github.com/ch3nnn/webstack-go) 深度定制开发的 **AI / 大模型 API 服务商导航平台**，专为聚合、展示和评价大模型 API 中转服务商而设计。由 **新疆幻城网安科技有限责任公司** 维护运营。
 
-> **算力支持**：本项目由 [新疆幻城网安公益大模型 API 中转站](https://api.iamhc.cn) 提供算力与接口测试支持。成品网站演示请看这里https://link.hcnsec.cn
+> **项目开源地址**：[https://github.com/yangqi1309134997-coder/free-model-links](https://github.com/yangqi1309134997-coder/free-model-links)
+
+> **算力支持**：本项目由 [新疆幻城网安公益大模型 API 中转站](https://api.iamhc.cn) 提供算力与接口测试支持。自研中转服务：[幻城 AI 中转站](https://api.hcnsec.cn)。成品网站演示请看这里 https://link.hcnsec.cn
 
 > 本项目在 webstack-go v2（Go + Gin + GORM + SQLite）基础上进行了大量功能增强和前端重构，保留了单二进制部署、零依赖（无需 MySQL/Redis）的轻量化优势。
+
+---
+
+## 内置分类体系
+
+系统首次启动时会自动内置一套完整的 **AI 大模型导航分类体系**，覆盖官方平台、中转服务商、公益免费资源与模型工具等维度：
+
+| 一级分类 | 二级分类 |
+| -------- | -------- |
+| 官方模型平台 | 国产大模型官方 · 国外大模型官方 |
+| 中转 API 服务商 | 大厂中转站 · 普通中转站 · 国内外全系中转 |
+| 公益与免费 | 纯公益网站 · 免费额度网站 |
+| 模型工具 | 模型聚合平台 · 模型评测与对比 · 开发工具与社区 |
+
+你可以在后台「网站管理 > 网站分类」中自由增删改分类，已有的内置分类仅作为初始模板，不会影响后续管理。
 
 ---
 
@@ -45,13 +62,12 @@
 - **投稿审核**：查看用户提交的站点信息，一键审核通过并自动入库
 - **系统设置**：
   - 网站基础信息（标题、关键词、描述、版权、Logo、Favicon、备案）
-  - 关于页面（Markdown 编辑器，支持启用/禁用）
-  - 网站语言、默认排序、匿名评分/评论/投稿开关
-  - 健康检查配置（间隔、失败阈值、手动触发）
-  - 首页布局（每行卡片数、精选/推荐区块显示开关）
-  - SEO 设置（作者、OG 图片、Twitter Card、Canonical、Robots）
-  - 友情链接（JSON 配置）
-  - 广告管理（完整 CRUD，按广告位筛选）
+  - SEO 深度优化（作者、OG 图片、Twitter Card、Canonical、Robots）
+  - 首页布局设置（每行卡片数、Hero 横幅、搜索框、顶部分类导航、精选/推荐区块、页脚开关）
+  - 功能开关（网站语言、默认排序、匿名评分/评论/投稿）
+  - 健康检查配置（启用开关、间隔、失败阈值、手动触发）
+  - 友情链接（JSON 配置，默认内置官方站/中转站/开源地址）
+  - 广告管理（完整 CRUD、按广告位与状态筛选、投放时段管理）
 
 ### 技术特性
 - **单二进制部署**：编译后仅需一个可执行文件 + SQLite 数据库文件
@@ -90,7 +106,7 @@ go mod tidy
 # 2. 编译
 go build -o ./bin/server ./cmd/server
 
-# 3. 首次启动（自动生成 SQLite 数据库与表结构）
+# 3. 首次启动（自动生成 SQLite 数据库、表结构与内置 AI 分类）
 ./bin/server -conf=config/prod.yml
 ```
 
@@ -249,7 +265,10 @@ go run ./cmd/gen
 **新疆幻城网安科技有限责任公司**
 
 - 官网：[https://hcnsec.cn](https://hcnsec.cn)
-- 本项目作为 API 服务商导航平台，旨在帮助开发者高效发现和对接大模型 API 资源。
+- 自研中转站：[https://api.hcnsec.cn](https://api.hcnsec.cn)
+- 公益大模型 API：[https://api.iamhc.cn](https://api.iamhc.cn)
+- 项目开源：[https://github.com/yangqi1309134997-coder/free-model-links](https://github.com/yangqi1309134997-coder/free-model-links)
+- 本项目作为 AI 大模型 API 导航平台，旨在帮助开发者高效发现和对接大模型 API 资源。
 
 ---
 

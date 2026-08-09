@@ -126,7 +126,9 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResp, error) {
 	if len(friendLinks) == 0 {
 		friendLinks = []v1.FriendLink{
 			{Name: "幻城网安科技", URL: "https://hcnsec.cn", Desc: "新疆幻城网安科技有限责任公司官网"},
+			{Name: "幻城 AI 中转站", URL: "https://api.hcnsec.cn", Desc: "幻城自研 AI 大模型 API 中转站"},
 			{Name: "公益大模型 API 分发", URL: "https://api.iamhc.cn", Desc: "公益大模型 API 分发平台"},
+			{Name: "项目开源地址", URL: "https://github.com/yangqi1309134997-coder/free-model-links", Desc: "本项目 GitHub 开源仓库"},
 		}
 	}
 
@@ -143,6 +145,13 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResp, error) {
 			AllowAnonymousRating:  sysConfig.AllowAnonymousRating,
 			AllowAnonymousReview:  sysConfig.AllowAnonymousReview,
 			AllowSubmission:       sysConfig.AllowSubmission,
+			CardsPerRow:           sysConfig.CardsPerRow,
+			ShowFeatured:          sysConfig.ShowFeatured,
+			ShowRecommended:       sysConfig.ShowRecommended,
+			ShowSearch:            sysConfig.ShowSearch,
+			ShowHero:              sysConfig.ShowHero,
+			ShowCategoryNav:       sysConfig.ShowCategoryNav,
+			ShowFooter:            sysConfig.ShowFooter,
 			SeoAuthor:             sysConfig.SeoAuthor,
 			SeoOgImage:            sysConfig.SeoOgImage,
 			SeoTwitterCard:        sysConfig.SeoTwitterCard,
@@ -156,10 +165,26 @@ func (s *service) Index(ctx context.Context) (*v1.IndexResp, error) {
 			AboutAuthor: sysConfig.AboutAuthor,
 			IsAbout:     sysConfig.IsAbout,
 		},
-		CategoryTree:  categoryTree,
-		CategorySites: categorySites,
-		Lang:          buildLangMap(sysConfig.SiteLang),
+		CategoryTree:     categoryTree,
+		CategorySites:    categorySites,
+		FeaturedSites:    filterSites(sites, true, false),
+		RecommendedSites: filterSites(sites, false, true),
+		Lang:             buildLangMap(sysConfig.SiteLang),
 	}, nil
+}
+
+// filterSites 按精选/推荐标记过滤站点，并按 sort 升序排列
+func filterSites(sites []*model.StSite, featured, recommended bool) []model.StSite {
+	result := make([]model.StSite, 0)
+	for _, site := range sites {
+		if site.IsFeatured == featured && site.IsRecommended == recommended {
+			result = append(result, *site)
+		}
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Sort < result[j].Sort
+	})
+	return result
 }
 
 func buildLangMap(lang string) map[string]string {

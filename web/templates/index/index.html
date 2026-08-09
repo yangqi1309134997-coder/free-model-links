@@ -34,11 +34,10 @@
         "url": "https://hcnsec.cn"
       }
     }
-    </script>
-    {{ if .ConfigSite.SiteFavicon }}
+    </script>    {{ if .ConfigSite.SiteFavicon }}
     <link rel="shortcut icon" href="data:image/png;base64,{{ .ConfigSite.SiteFavicon }}">
     {{ else }}
-    <link rel="shortcut icon" href="/assets/static/index/images/favicon.png">
+    <link rel="shortcut icon" href="/assets/static/index/images/favicon_global.png">
     {{ end }}
     <link rel="stylesheet" href="/assets/static/index/css/apple-design.css">
 </head>
@@ -49,16 +48,20 @@
         {{ if .ConfigSite.SiteLogo }}
         <a href="/"><img src="data:image/png;base64,{{ .ConfigSite.SiteLogo }}" alt="{{ .ConfigSite.SiteCopyright }}"></a>
         {{ else }}
-        <a href="/" style="font-weight:600;font-size:16px;color:var(--text-primary);text-decoration:none;">新疆幻城网安科技</a>
+        <a href="/"><img src="/assets/static/index/images/logo_global.png" alt="{{ .ConfigSite.SiteCopyright }}"></a>
         {{ end }}
     </div>
     <nav class="nav-links" id="category-nav">
-        {{ range .CategoryTree }}
+        {{ if .ConfigSite.ShowCategoryNav }}{{ range .CategoryTree }}
         <a href="#cat-{{ .Name }}" class="smooth">{{ .Name }}</a>
-        {{ end }}
+        {{ end }}{{ end }}
     </nav>
     <div class="nav-actions">
         <a href="https://api.iamhc.cn" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="background:var(--accent);color:#fff;">公益API</a>
+        <a href="https://github.com/yangqi1309134997-coder/free-model-links" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" title="项目开源地址">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            开源
+        </a>
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </button>
@@ -71,21 +74,36 @@
     </div>
 </header>
 
+{{ if .ConfigSite.ShowHero }}
 <section class="hero-section">
     <h1>{{ .ConfigSite.SiteTitle }}</h1>
     <p>{{ .ConfigSite.SiteDesc }}</p>
+    {{ if .ConfigSite.ShowSearch }}
     <div class="search-container">
         <input type="text" id="search-input" placeholder="{{ index .Lang "search_placeholder" }}" autocomplete="off">
         <span class="search-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </span>
     </div>
+    {{ end }}
     <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:24px;">
         {{ range .CategoryTree }}
         <a href="#cat-{{ .Name }}" class="filter-chip smooth">{{ .Name }}</a>
         {{ end }}
     </div>
 </section>
+{{ else }}
+{{ if .ConfigSite.ShowSearch }}
+<section class="hero-section">
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="{{ index .Lang "search_placeholder" }}" autocomplete="off">
+        <span class="search-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </span>
+    </div>
+</section>
+{{ end }}
+{{ end }}
 
 <!-- 广告位：首页顶部 -->
 <div id="ad-homepage-top" style="max-width:1200px;margin:0 auto;padding:0 24px;"></div>
@@ -101,10 +119,78 @@
     </select>
 </div>
 
+{{ if and .ConfigSite.ShowFeatured .FeaturedSites }}
+<h3 class="section-title" id="cat-featured">🔥 精选推荐</h3>
+<div class="card-grid" style="grid-template-columns:repeat({{ .ConfigSite.CardsPerRow }}, minmax(0,1fr));">
+    {{ range .FeaturedSites }}
+    <div class="site-card" data-rating="{{ .AvgRating }}" data-reviews="{{ .ReviewCount }}" onclick="location.href='/site/{{ .ID }}'">
+        {{ if .IsFeatured }}<span class="badge-featured">{{ $.Lang.featured }}</span>{{ end }}
+        <button class="btn-visit" onclick="event.stopPropagation(); window.open('{{ .URL }}', '_blank')" title="Visit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </button>
+        <div class="card-header">
+            <div class="card-icon">
+                {{ if .Icon }}
+                <img src="data:image/png;base64,{{ .Icon }}" alt="{{ .Title }}" loading="lazy">
+                {{ else }}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/></svg>
+                {{ end }}
+            </div>
+            <div class="card-info">
+                <div class="card-title">{{ .Title }}</div>
+                <div class="card-desc">{{ .Description }}</div>
+            </div>
+        </div>
+        <div class="card-meta">
+            <div class="card-rating">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                {{ if .AvgRating }}<span>{{ printf "%.1f" .AvgRating }}</span>{{ else }}<span>--</span>{{ end }}
+                <span class="count">({{ .RatingCount }})</span>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}
+
+{{ if and .ConfigSite.ShowRecommended .RecommendedSites }}
+<h3 class="section-title" id="cat-recommended">⭐ 站长推荐</h3>
+<div class="card-grid" style="grid-template-columns:repeat({{ .ConfigSite.CardsPerRow }}, minmax(0,1fr));">
+    {{ range .RecommendedSites }}
+    <div class="site-card" data-rating="{{ .AvgRating }}" data-reviews="{{ .ReviewCount }}" onclick="location.href='/site/{{ .ID }}'">
+        <span class="badge-featured" style="background:var(--success)">{{ $.Lang.recommended }}</span>
+        <button class="btn-visit" onclick="event.stopPropagation(); window.open('{{ .URL }}', '_blank')" title="Visit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </button>
+        <div class="card-header">
+            <div class="card-icon">
+                {{ if .Icon }}
+                <img src="data:image/png;base64,{{ .Icon }}" alt="{{ .Title }}" loading="lazy">
+                {{ else }}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/></svg>
+                {{ end }}
+            </div>
+            <div class="card-info">
+                <div class="card-title">{{ .Title }}</div>
+                <div class="card-desc">{{ .Description }}</div>
+            </div>
+        </div>
+        <div class="card-meta">
+            <div class="card-rating">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                {{ if .AvgRating }}<span>{{ printf "%.1f" .AvgRating }}</span>{{ else }}<span>--</span>{{ end }}
+                <span class="count">({{ .RatingCount }})</span>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}
+
 {{ range .CategorySites }}
 {{ if .SiteList }}
 <h3 class="section-title" id="cat-{{ .Category }}">{{ .Category }}</h3>
-<div class="card-grid">
+<div class="card-grid" style="grid-template-columns:repeat({{ $.ConfigSite.CardsPerRow }}, minmax(0,1fr));">
     {{ range .SiteList }}
     <div class="site-card" data-rating="{{ .AvgRating }}" data-reviews="{{ .ReviewCount }}" onclick="location.href='/site/{{ .ID }}'">
         {{ if .IsFeatured }}<span class="badge-featured">{{ $.Lang.featured }}</span>{{ end }}
@@ -140,6 +226,7 @@
 <!-- 广告位：首页底部 -->
 <div id="ad-homepage-bottom" style="max-width:1200px;margin:0 auto;padding:24px;"></div>
 
+{{ if .ConfigSite.ShowFooter }}
 <footer class="site-footer">
     {{ if .ConfigSite.FriendLinks }}
     <div class="friend-links" style="text-align:center;margin-bottom:16px;padding:16px 0;border-top:1px solid var(--border-color);">
@@ -152,22 +239,24 @@
     {{ end }}
     <p style="text-align:center;margin:0;color:var(--text-tertiary);font-size:13px;">
         &copy; 2024-2026 <a href="https://hcnsec.cn" target="_blank" rel="noopener" style="color:var(--text-secondary);text-decoration:none;">{{ .ConfigSite.SiteCopyright }}</a>
+        · <a href="https://api.hcnsec.cn" target="_blank" rel="noopener" style="color:var(--text-secondary);text-decoration:none;">幻城 AI 中转站</a>
+        · <a href="https://github.com/yangqi1309134997-coder/free-model-links" target="_blank" rel="noopener" style="color:var(--text-secondary);text-decoration:none;">项目开源</a>
         {{ if .ConfigSite.SiteRecord }} · <a href="{{ .ConfigSite.SiteURL }}" target="_blank" rel="noopener" style="color:var(--text-tertiary);">{{ .ConfigSite.SiteRecord }}</a>{{ end }}
     </p>
 </footer>
+{{ end }}
 
 <script>
-var LANG = {{ .ConfigSite.SiteLang }};
+var LANG = '{{ .ConfigSite.SiteLang }}';
 var LANG_DATA = {
     api_providers_count: '{{ index .Lang "api_providers_count" }}',
     my_account: '{{ index .Lang "my_account" }}'
 };
 function toggleTheme(){var h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n)}
 (function(){var s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark')})();
-document.getElementById('search-input').addEventListener('input',function(e){var q=e.target.value.toLowerCase();document.querySelectorAll('.site-card').forEach(function(c){var t=c.querySelector('.card-title').textContent.toLowerCase();var d=c.querySelector('.card-desc').textContent.toLowerCase();c.style.display=(t.includes(q)||d.includes(q))?'':'none'})});
-document.querySelectorAll('a.smooth,a.filter-chip').forEach(function(a){a.addEventListener('click',function(e){var href=decodeURI(this.getAttribute('href'));var t=document.querySelector(href);if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}})});
+var si=document.getElementById('search-input');if(si){si.addEventListener('input',function(e){var q=e.target.value.toLowerCase();document.querySelectorAll('.site-card').forEach(function(c){var t=c.querySelector('.card-title').textContent.toLowerCase();var d=c.querySelector('.card-desc').textContent.toLowerCase();c.style.display=(t.includes(q)||d.includes(q))?'':'none'})})}document.querySelectorAll('a.smooth,a.filter-chip').forEach(function(a){a.addEventListener('click',function(e){var href=decodeURI(this.getAttribute('href'));var t=document.querySelector(href);if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}})});
 function sortSites(m){document.querySelectorAll('.card-grid').forEach(function(g){var c=Array.from(g.children);c.sort(function(a,b){var ra=parseFloat(a.dataset.rating)||0,rb=parseFloat(b.dataset.rating)||0,rva=parseInt(a.dataset.reviews)||0,rvb=parseInt(b.dataset.reviews)||0;switch(m){case'rating-desc':return rb-ra;case'rating-asc':return ra-rb;case'reviews-desc':return rvb-rva;default:return 0}});c.forEach(function(x){g.appendChild(x)})})}
-var total=document.querySelectorAll('.site-card').length;document.getElementById('site-count').textContent=total+' '+LANG_DATA.api_providers_count;
+var total=document.querySelectorAll('.card-grid .site-card').length;document.getElementById('site-count').textContent=total+' '+LANG_DATA.api_providers_count;
 
 // 加载广告
 function loadAds(slot, containerId){

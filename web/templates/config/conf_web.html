@@ -69,6 +69,29 @@
                                         </div>
                                     </form>
                                 </div>
+                                <div class="form-group">
+                                    <label>SEO 深度优化</label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control mb-2" id="seoAuthor" placeholder="网站作者（SEO）"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control mb-2" id="seoOgImage" placeholder="OG / Twitter 分享图 URL"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <select class="form-control mb-2" id="seoTwitterCard">
+                                                <option value="summary">Twitter Card: summary</option>
+                                                <option value="summary_large_image">Twitter Card: summary_large_image</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control mb-2" id="seoCanonicalURL" placeholder="Canonical 规范链接 URL"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" id="seoRobots" placeholder="Robots 指令，如 index,follow"/>
+                                        </div>
+                                    </div>
+                                </div>
                                 <button type="button" id="btnSite" class="btn btn-primary">确认</button>
                             </form>
                         </div>
@@ -192,6 +215,12 @@
                 if (data.site_url) {
                     document.getElementById('siteURL').value = data.site_url;
                 }
+                // SEO 回显
+                if (data.seo_author) document.getElementById('seoAuthor').value = data.seo_author;
+                if (data.seo_og_image) document.getElementById('seoOgImage').value = data.seo_og_image;
+                if (data.seo_twitter_card) document.getElementById('seoTwitterCard').value = data.seo_twitter_card;
+                if (data.seo_canonical_url) document.getElementById('seoCanonicalURL').value = data.seo_canonical_url;
+                if (data.seo_robots) document.getElementById('seoRobots').value = data.seo_robots;
                 if (data.site_logo) {// 回显Logo（Base64）
                     document.getElementById('siteLogoPreview').src = `data:image/png;base64,${data.site_logo}`;
                 } else {
@@ -252,6 +281,11 @@
         const siteURL = document.getElementById('siteURL').value; // 备案信息
         const siteLogo = document.getElementById('siteLogo').files[0]; // 网站Logo
         const siteFavicon = document.getElementById('siteFavicon').files[0]; // 网站Favicon
+        const seoAuthor = document.getElementById('seoAuthor').value; // SEO 作者
+        const seoOgImage = document.getElementById('seoOgImage').value; // OG 图
+        const seoTwitterCard = document.getElementById('seoTwitterCard').value; // Twitter Card
+        const seoCanonicalURL = document.getElementById('seoCanonicalURL').value; // Canonical
+        const seoRobots = document.getElementById('seoRobots').value; // Robots
 
         const formData = new FormData();
         formData.append('site_title', siteTitle);
@@ -260,6 +294,11 @@
         formData.append('site_copyright', siteCopyright);
         formData.append('site_record', siteRecord);
         formData.append('site_url', siteURL);
+        formData.append('seo_author', seoAuthor);
+        formData.append('seo_og_image', seoOgImage);
+        formData.append('seo_twitter_card', seoTwitterCard);
+        formData.append('seo_canonical_url', seoCanonicalURL);
+        formData.append('seo_robots', seoRobots);
         if (siteLogo) {
             formData.append('logo', siteLogo);
         }

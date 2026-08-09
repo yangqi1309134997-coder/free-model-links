@@ -30,5 +30,10 @@ func (s *service) GetConfig(ctx context.Context) (*v1.ConfigResp, error) {
 		SiteLogo:      conf.SiteLogo,
 		SiteFavicon:   conf.SiteFavicon,
 		SiteCopyright: conf.SiteCopyright,
+		SeoAuthor:       conf.SeoAuthor,
+		SeoOgImage:      conf.SeoOgImage,
+		SeoTwitterCard:  conf.SeoTwitterCard,
+		SeoCanonicalURL: conf.SeoCanonicalURL,
+		SeoRobots:       conf.SeoRobots,
 	}, nil
 }

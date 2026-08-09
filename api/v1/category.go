@@ -72,6 +72,7 @@ type (
 		Name   string `json:"name"`    // 分类名称
 		Icon   string `json:"icon"`    // 图标
 		IsAdd  bool   `json:"is_add"`  // 是否新增子分类
+		IsUsed bool   `json:"is_used"` // 是否启用
 		SortID int    `json:"sort_id"` // 排序 ID
 	}
 )

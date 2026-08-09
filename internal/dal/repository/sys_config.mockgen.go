@@ -39,6 +39,7 @@ func NewMockISysConfigDao(ctrl *gomock.Controller) *MockISysConfigDao {
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
+
 func (m *MockISysConfigDao) EXPECT() *MockISysConfigDaoMockRecorder {
 	return m.recorder
 }
@@ -125,6 +126,20 @@ func (m *MockISysConfigDao) WhereBySiteFavicon(siteFavicon string) func(gen.Dao)
 func (mr *MockISysConfigDaoMockRecorder) WhereBySiteFavicon(siteFavicon any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WhereBySiteFavicon", reflect.TypeOf((*MockISysConfigDao)(nil).WhereBySiteFavicon), siteFavicon)
+}
+
+// WhereBySiteURL mocks base method.
+func (m *MockISysConfigDao) WhereBySiteURL(siteUrl string) func(gen.Dao) gen.Dao {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WhereBySiteURL", siteUrl)
+	ret0, _ := ret[0].(func(gen.Dao) gen.Dao)
+	return ret0
+}
+
+// WhereBySiteURL indicates an expected call of WhereBySiteURL.
+func (mr *MockISysConfigDaoMockRecorder) WhereBySiteURL(siteUrl any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WhereBySiteURL", reflect.TypeOf((*MockISysConfigDao)(nil).WhereBySiteURL), siteUrl)
 }
 
 // WhereBySiteKeyword mocks base method.

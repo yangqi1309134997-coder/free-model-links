@@ -57,12 +57,22 @@ function showAdd(){
     },cancel:function(){}}});
 }
 function editModel(id){
-    $.confirm({title:'编辑模型',content:'<div class="form-group"><label>名称</label><input class="form-control" id="m-name" required></div><div class="form-group"><label>提供商</label><input class="form-control" id="m-provider"></div><div class="form-group"><label>排序</label><input class="form-control" id="m-sort" type="number"></div><div class="form-group"><label>启用</label><select class="form-control" id="m-used"><option value="true">是</option><option value="false">否</option></select></div>',
+    // 从当前表格行预填
+    var row=null;
+    $('.tbody tr').each(function(){
+        if($(this).find('td').eq(0).text()===String(id)){ row=$(this); }
+    });
+    var name=row?row.find('td').eq(1).text().trim():'';
+    var provider=row?row.find('td').eq(2).text().trim():'';
+    var sort=row?row.find('td').eq(4).text().trim():'0';
+    var used=row?(row.find('td').eq(5).text().indexOf('启用')>=0):true;
+    $.confirm({title:'编辑模型',content:'<div class="form-group"><label>名称</label><input class="form-control" id="m-name" value="'+escapeAttr(name)+'" required></div><div class="form-group"><label>提供商</label><input class="form-control" id="m-provider" value="'+escapeAttr(provider)+'"></div><div class="form-group"><label>排序</label><input class="form-control" id="m-sort" type="number" value="'+escapeAttr(sort)+'"></div><div class="form-group"><label>启用</label><select class="form-control" id="m-used"><option value="true"'+(!used?'':' selected')+'>是</option><option value="false"'+(!used?' selected':'')+'>否</option></select></div>',
     buttons:{confirm:function(){
         var data={name:$('#m-name').val(),provider:$('#m-provider').val(),sort:parseInt($('#m-sort').val())||0,is_used:$('#m-used').val()==='true'};
         AjaxPostJson('/api/admin/models/'+id,data,function(){},function(d){$.alert({title:'成功',type:'green',content:'已更新'});loadModels();},function(e){AjaxError(e);});
     },cancel:function(){}}});
 }
+function escapeAttr(t){if(!t)return'';return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function deleteModel(id){
     $.confirm({title:'确认',content:'确定删除?',type:'red',buttons:{confirm:function(){
         AjaxForm('DELETE','/api/admin/models/'+id,'',function(){},function(d){$.alert({title:'成功',type:'green',content:'已删除'});loadModels();},function(e){AjaxError(e);});

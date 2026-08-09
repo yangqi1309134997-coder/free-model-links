@@ -56,8 +56,8 @@ function loadRatings() {
         (d.list||[]).forEach(function(r) {
             var stars = '';
             for(var i=1;i<=5;i++) stars += i<=r.score?'★':'☆';
-            html += '<tr><td>'+r.id+'</td><td>'+r.site_title+'</td><td>'+(r.visitor_id||'-')+'</td>';
-            html += '<td><span style="color:#f5a623">'+stars+'</span> '+r.score+'</td><td>'+r.created_at+'</td>';
+            html += '<tr><td>'+r.id+'</td><td>'+escapeHtml(r.site_title)+'</td><td>'+escapeHtml(r.visitor_id||'-')+'</td>';
+            html += '<td><span style="color:#f5a623">'+stars+'</span> '+r.score+'</td><td>'+escapeHtml(r.created_at)+'</td>';
             html += '<td style="text-align:center">';
             html += '<button class="btn btn-sm btn-warning m-r-5" onclick="editRating('+r.id+','+r.score+')">编辑</button>';
             html += '<button class="btn btn-sm btn-danger" onclick="deleteRating('+r.id+')">删除</button>';
@@ -67,6 +67,7 @@ function loadRatings() {
         renderPagination(d.pagination);
     }, function(e){ AjaxError(e); });
 }
+function escapeHtml(t){if(!t)return'';return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function editRating(id, score) {
     var newScore = prompt('输入新评分 (1-5):', score);
     if (!newScore || newScore<1 || newScore>5) return;

@@ -23,6 +23,7 @@ func (s *service) Detail(ctx context.Context, req *v1.CategoryDetailReq) (*v1.Ca
 		Name:   category.Title,
 		Icon:   category.Icon,
 		IsAdd:  category.ParentID == 0,
+		IsUsed: category.IsUsed,
 		SortID: category.Sort,
 	}, err
 }

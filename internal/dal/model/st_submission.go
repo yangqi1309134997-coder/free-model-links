@@ -12,6 +12,8 @@ type StSubmission struct {
 	Description string     `gorm:"column:description;type:text" json:"description"`
 	CategoryID  int        `gorm:"column:category_id;type:int(11)" json:"category_id"`
 	Contact     string     `gorm:"column:contact;type:varchar(255)" json:"contact"`
+	Icon        string     `gorm:"column:icon;type:text" json:"icon"`
+	ModelIDs    string     `gorm:"column:model_ids;type:text" json:"model_ids"`
 	Status      string     `gorm:"column:status;type:varchar(20);default:'pending'" json:"status"`
 	AdminNote   string     `gorm:"column:admin_note;type:text" json:"admin_note"`
 	CreatedAt   *time.Time `gorm:"column:created_at;type:datetime;not null;default:CURRENT_TIMESTAMP not null" json:"created_at"`
@@ -21,4 +23,26 @@ type StSubmission struct {
 
 func (*StSubmission) TableName() string {
 	return TableNameStSubmission
+}
+
+const TableNameStSubmissionTag = "st_submission_tag"
+
+type StSubmissionTag struct {
+	SubmissionID int `gorm:"column:submission_id;type:int(11);primaryKey" json:"submission_id"`
+	TagID        int `gorm:"column:tag_id;type:int(11);primaryKey" json:"tag_id"`
+}
+
+func (*StSubmissionTag) TableName() string {
+	return TableNameStSubmissionTag
+}
+
+const TableNameStSubmissionPayment = "st_submission_payment"
+
+type StSubmissionPayment struct {
+	SubmissionID    int `gorm:"column:submission_id;type:int(11);primaryKey" json:"submission_id"`
+	PaymentMethodID int `gorm:"column:payment_method_id;type:int(11);primaryKey" json:"payment_method_id"`
+}
+
+func (*StSubmissionPayment) TableName() string {
+	return TableNameStSubmissionPayment
 }

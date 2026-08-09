@@ -124,7 +124,9 @@
                     categoryFilter.empty();
                     categoryFilter.append('<option value="">全部分类</option>');
                     $.each(data.list, function (index, category) {
-                        categoryFilter.append('<option value="' + category.id + '">' + category.name + '</option>');
+                        // 仅展示一级分类，二级分类带缩进标识
+                        let prefix = category.pid === 0 ? '' : '　└ ';
+                        categoryFilter.append('<option value="' + category.id + '">' + prefix + category.name + '</option>');
                     });
                     categoryFilter.selectpicker('refresh');
                 },

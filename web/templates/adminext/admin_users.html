@@ -42,11 +42,16 @@ function loadUsers() {
         (d.list||[]).forEach(function(u){
             var badge=u.status==='active'?'badge-success':'badge-danger';
             var statusText=u.status==='active'?'正常':'禁用';
-            html+='<tr><td>'+u.id+'</td><td>'+u.username+'</td><td>'+u.role+'</td>';
+            var roleText=u.role==='admin'?'管理员':'普通用户';
+            html+='<tr><td>'+u.id+'</td><td>'+escapeHtml(u.username)+'</td>';
+            html+='<td><span class="badge '+(u.role==='admin'?'badge-primary':'badge-info')+'">'+roleText+'</span></td>';
             html+='<td><span class="badge '+badge+'">'+statusText+'</span></td>';
             html+='<td style="text-align:center">';
-            if(u.status==='active') html+='<button class="btn btn-sm btn-danger" onclick="toggleStatus('+u.id+',\'banned\')">禁用</button>';
-            else html+='<button class="btn btn-sm btn-success" onclick="toggleStatus('+u.id+',\'active\')">启用</button>';
+            if(u.id===1){ html+='<span class="text-muted">超级管理员</span>'; }
+            else {
+                if(u.status==='active') html+='<button class="btn btn-sm btn-danger" onclick="toggleStatus('+u.id+',\'banned\')">禁用</button>';
+                else html+='<button class="btn btn-sm btn-success" onclick="toggleStatus('+u.id+',\'active\')">启用</button>';
+            }
             html+='</td></tr>';
         });
         $('.tbody').html(html||'<tr><td colspan="5" class="text-center">暂无数据</td></tr>');
@@ -58,7 +63,24 @@ function toggleStatus(id,status){
         $.alert({title:'成功',type:'green',content:'操作成功'});loadUsers();
     },function(e){AjaxError(e);});
 }
-function showAdd(){$.alert({title:'提示',type:'orange',content:'请通过数据库直接添加管理员用户'});}
+function showAdd(){
+    $.confirm({title:'新增用户',content:
+        '<div class="form-group"><label>用户名</label><input class="form-control" id="u-username" required></div>'+
+        '<div class="form-group"><label>密码</label><input class="form-control" id="u-password" type="password" required></div>'+
+        '<div class="form-group"><label>角色</label><select class="form-control" id="u-role"><option value="user">普通用户</option><option value="admin">管理员</option></select></div>'+
+        '<div class="form-group"><label>状态</label><select class="form-control" id="u-status"><option value="active">正常</option><option value="banned">禁用</option></select></div>',
+    buttons:{confirm:function(){
+        var username=$('#u-username').val().trim();
+        var password=$('#u-password').val();
+        if(!username){$.alert({title:'提示',type:'orange',content:'请输入用户名'});return false}
+        if(password.length<6){$.alert({title:'提示',type:'orange',content:'密码至少 6 位'});return false}
+        var data={username:username,password:password,role:$('#u-role').val(),status:$('#u-status').val()};
+        AjaxPostJson('/api/admin/users',data,function(){},function(d){
+            $.alert({title:'成功',type:'green',content:'用户已创建'});loadUsers();
+        },function(e){AjaxError(e);});
+    },cancel:function(){}}});
+}
+function escapeHtml(t){if(!t)return'';return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function renderPagination(p){if(!p)return;var total=Math.ceil(p.total/p.per_page_count);var html='';for(var i=1;i<=total;i++)html+='<li class="page-item'+(i===p.current_page?' active':'')+'"><a class="page-link" href="javascript:void(0)" onclick="page='+i+';loadUsers()">'+i+'</a></li>';$('#pagination').html(html);}
 $(function(){loadUsers();});
 </script>

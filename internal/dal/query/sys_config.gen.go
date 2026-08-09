@@ -40,6 +40,26 @@ func newSysConfig(db *gorm.DB, opts ...gen.DOOption) sysConfig {
 	_sysConfig.SiteURL = field.NewString(tableName, "site_url")
 	_sysConfig.SiteCopyright = field.NewString(tableName, "site_copyright")
 
+	_sysConfig.CardsPerRow = field.NewInt(tableName, "cards_per_row")
+	_sysConfig.ShowFeatured = field.NewBool(tableName, "show_featured")
+	_sysConfig.ShowRecommended = field.NewBool(tableName, "show_recommended")
+	_sysConfig.ShowSearch = field.NewBool(tableName, "show_search")
+	_sysConfig.ShowHero = field.NewBool(tableName, "show_hero")
+	_sysConfig.ShowCategoryNav = field.NewBool(tableName, "show_category_nav")
+	_sysConfig.ShowFooter = field.NewBool(tableName, "show_footer")
+	_sysConfig.SeoAuthor = field.NewString(tableName, "seo_author")
+	_sysConfig.SeoOgImage = field.NewString(tableName, "seo_og_image")
+	_sysConfig.SeoTwitterCard = field.NewString(tableName, "seo_twitter_card")
+	_sysConfig.SeoCanonicalURL = field.NewString(tableName, "seo_canonical_url")
+	_sysConfig.SeoRobots = field.NewString(tableName, "seo_robots")
+	_sysConfig.FriendLinks = field.NewString(tableName, "friend_links")
+	_sysConfig.HomepageSections = field.NewString(tableName, "homepage_sections")
+	_sysConfig.FeaturedSiteIDs = field.NewField(tableName, "featured_site_ids")
+	_sysConfig.HealthCheckInterval = field.NewInt(tableName, "health_check_interval")
+	_sysConfig.HealthCheckMaxFails = field.NewInt(tableName, "health_check_max_fails")
+	_sysConfig.HealthCheckEnabled = field.NewBool(tableName, "health_check_enabled")
+	_sysConfig.DefaultSort = field.NewString(tableName, "default_sort")
+
 	_sysConfig.fillFieldMap()
 
 	return _sysConfig
@@ -61,6 +81,26 @@ type sysConfig struct {
 	SiteFavicon   field.String
 	SiteURL       field.String
 	SiteCopyright field.String
+
+	CardsPerRow          field.Int
+	ShowFeatured         field.Bool
+	ShowRecommended      field.Bool
+	ShowSearch           field.Bool
+	ShowHero             field.Bool
+	ShowCategoryNav      field.Bool
+	ShowFooter           field.Bool
+	SeoAuthor            field.String
+	SeoOgImage           field.String
+	SeoTwitterCard       field.String
+	SeoCanonicalURL      field.String
+	SeoRobots            field.String
+	FriendLinks          field.String
+	HomepageSections     field.String
+	FeaturedSiteIDs      field.Field
+	HealthCheckInterval  field.Int
+	HealthCheckMaxFails  field.Int
+	HealthCheckEnabled   field.Bool
+	DefaultSort          field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -89,6 +129,25 @@ func (s *sysConfig) updateTableName(table string) *sysConfig {
 	s.SiteFavicon = field.NewString(table, "site_favicon")
 	s.SiteURL = field.NewString(table, "site_url")
 	s.SiteCopyright = field.NewString(table, "site_copyright")
+	s.CardsPerRow = field.NewInt(table, "cards_per_row")
+	s.ShowFeatured = field.NewBool(table, "show_featured")
+	s.ShowRecommended = field.NewBool(table, "show_recommended")
+	s.ShowSearch = field.NewBool(table, "show_search")
+	s.ShowHero = field.NewBool(table, "show_hero")
+	s.ShowCategoryNav = field.NewBool(table, "show_category_nav")
+	s.ShowFooter = field.NewBool(table, "show_footer")
+	s.SeoAuthor = field.NewString(table, "seo_author")
+	s.SeoOgImage = field.NewString(table, "seo_og_image")
+	s.SeoTwitterCard = field.NewString(table, "seo_twitter_card")
+	s.SeoCanonicalURL = field.NewString(table, "seo_canonical_url")
+	s.SeoRobots = field.NewString(table, "seo_robots")
+	s.FriendLinks = field.NewString(table, "friend_links")
+	s.HomepageSections = field.NewString(table, "homepage_sections")
+	s.FeaturedSiteIDs = field.NewField(table, "featured_site_ids")
+	s.HealthCheckInterval = field.NewInt(table, "health_check_interval")
+	s.HealthCheckMaxFails = field.NewInt(table, "health_check_max_fails")
+	s.HealthCheckEnabled = field.NewBool(table, "health_check_enabled")
+	s.DefaultSort = field.NewString(table, "default_sort")
 
 	s.fillFieldMap()
 
@@ -115,7 +174,7 @@ func (s *sysConfig) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (s *sysConfig) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 12)
+	s.fieldMap = make(map[string]field.Expr, 33)
 	s.fieldMap["id"] = s.ID
 	s.fieldMap["about_site"] = s.AboutSite
 	s.fieldMap["about_author"] = s.AboutAuthor
@@ -128,6 +187,25 @@ func (s *sysConfig) fillFieldMap() {
 	s.fieldMap["site_favicon"] = s.SiteFavicon
 	s.fieldMap["site_url"] = s.SiteURL
 	s.fieldMap["site_copyright"] = s.SiteCopyright
+	s.fieldMap["cards_per_row"] = s.CardsPerRow
+	s.fieldMap["show_featured"] = s.ShowFeatured
+	s.fieldMap["show_recommended"] = s.ShowRecommended
+	s.fieldMap["show_search"] = s.ShowSearch
+	s.fieldMap["show_hero"] = s.ShowHero
+	s.fieldMap["show_category_nav"] = s.ShowCategoryNav
+	s.fieldMap["show_footer"] = s.ShowFooter
+	s.fieldMap["seo_author"] = s.SeoAuthor
+	s.fieldMap["seo_og_image"] = s.SeoOgImage
+	s.fieldMap["seo_twitter_card"] = s.SeoTwitterCard
+	s.fieldMap["seo_canonical_url"] = s.SeoCanonicalURL
+	s.fieldMap["seo_robots"] = s.SeoRobots
+	s.fieldMap["friend_links"] = s.FriendLinks
+	s.fieldMap["homepage_sections"] = s.HomepageSections
+	s.fieldMap["featured_site_ids"] = s.FeaturedSiteIDs
+	s.fieldMap["health_check_interval"] = s.HealthCheckInterval
+	s.fieldMap["health_check_max_fails"] = s.HealthCheckMaxFails
+	s.fieldMap["health_check_enabled"] = s.HealthCheckEnabled
+	s.fieldMap["default_sort"] = s.DefaultSort
 }
 
 func (s sysConfig) clone(db *gorm.DB) sysConfig {

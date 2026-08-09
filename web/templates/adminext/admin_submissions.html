@@ -25,7 +25,7 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
-                            <thead><tr><th>ID</th><th>URL</th><th>标题</th><th>描述</th><th>联系方式</th><th>状态</th><th>备注</th><th>时间</th><th style="text-align:center">操作</th></tr></thead>
+                            <thead><tr><th>ID</th><th>URL</th><th>标题</th><th>分类</th><th>描述</th><th>联系方式</th><th>状态</th><th>备注</th><th>时间</th><th style="text-align:center">操作</th></tr></thead>
                             <tbody class="tbody"></tbody>
                         </table>
                     </div>
@@ -50,25 +50,124 @@ function loadSubmissions(){
         (d.list||[]).forEach(function(s){
             var badge=s.status==='approved'?'badge-success':s.status==='rejected'?'badge-danger':'badge-warning';
             var statusText=s.status==='approved'?'已通过':s.status==='rejected'?'已拒绝':'待审核';
-            html+='<tr><td>'+s.id+'</td><td><a href="'+s.url+'" target="_blank">'+s.url+'</a></td><td>'+s.title+'</td>';
-            html+='<td>'+(s.description||'')+'</td><td>'+(s.contact||'')+'</td>';
-            html+='<td><span class="badge '+badge+'">'+statusText+'</span></td><td>'+(s.admin_note||'')+'</td><td>'+s.created_at+'</td>';
+            var iconHtml='';
+            if(s.icon){ iconHtml='<img src="data:image/png;base64,'+s.icon+'" style="width:20px;height:20px;border-radius:4px;vertical-align:middle;margin-right:4px">'; }
+            html+='<tr><td>'+s.id+'</td><td><a href="'+escapeAttr(s.url)+'" target="_blank" rel="noopener">'+escapeHtml(s.url)+'</a></td>';
+            html+='<td>'+iconHtml+escapeHtml(s.title||'')+'</td><td>'+escapeHtml(s.category_name||'')+'</td>';
+            html+='<td>'+escapeHtml(s.description||'')+'</td><td>'+escapeHtml(s.contact||'')+'</td>';
+            html+='<td><span class="badge '+badge+'">'+statusText+'</span></td><td>'+escapeHtml(s.admin_note||'')+'</td><td>'+escapeHtml(s.created_at||'')+'</td>';
             html+='<td style="text-align:center">';
-            if(s.status!=='approved') html+='<button class="btn btn-sm btn-success m-r-5" onclick="updateSub('+s.id+',\'approved\')">通过</button>';
-            if(s.status!=='rejected') html+='<button class="btn btn-sm btn-danger" onclick="updateSub('+s.id+',\'rejected\')">拒绝</button>';
+            if(s.status==='pending'){
+                html+='<button class="btn btn-sm btn-success m-r-5" onclick="approveSub('+s.id+')">通过</button>';
+                html+='<button class="btn btn-sm btn-info m-r-5" onclick="editSub('+s.id+')">编辑</button>';
+                html+='<button class="btn btn-sm btn-danger" onclick="rejectSub('+s.id+')">拒绝</button>';
+            } else if(s.status==='approved'){
+                html+='<span class="text-muted">已通过</span>';
+            } else {
+                html+='<button class="btn btn-sm btn-info m-r-5" onclick="editSub('+s.id+')">编辑</button>';
+                html+='<span class="text-muted">已拒绝</span>';
+            }
             html+='</td></tr>';
         });
-        $('.tbody').html(html||'<tr><td colspan="9" class="text-center">暂无数据</td></tr>');
+        $('.tbody').html(html||'<tr><td colspan="10" class="text-center">暂无数据</td></tr>');
         renderPagination(d.pagination);
     },function(e){AjaxError(e);});
 }
-function updateSub(id,status){
-    var note='';
-    if(status==='rejected') note=prompt('拒绝原因（可选）:')||'';
-    AjaxPostJson('/api/admin/submissions/'+id,{status:status,admin_note:note},function(){},function(d){
-        $.alert({title:'成功',type:'green',content:'操作成功'});loadSubmissions();
+// 通过：先编辑（可修改标题/URL/Logo/分类/描述/联系方式）再通过
+function approveSub(id){
+    loadSubDetail(id,function(s){
+        var catOptions=buildCategoryOptions(s.category_id);
+        $.confirm({title:'通过审核（可先修改信息）',content:
+            '<div class="form-group"><label>标题</label><input class="form-control" id="sub-title" value="'+escapeAttr(s.title||'')+'"></div>'+
+            '<div class="form-group"><label>URL</label><input class="form-control" id="sub-url" value="'+escapeAttr(s.url)+'"></div>'+
+            '<div class="form-group"><label>Logo URL / Base64</label><input class="form-control" id="sub-icon" value="'+escapeAttr(s.icon||'')+'"></div>'+
+            '<div class="form-group"><label>分类</label><select class="form-control" id="sub-category">'+catOptions+'</select></div>'+
+            '<div class="form-group"><label>描述</label><textarea class="form-control" id="sub-desc" rows="3">'+escapeHtml(s.description||'')+'</textarea></div>'+
+            '<div class="form-group"><label>联系方式</label><input class="form-control" id="sub-contact" value="'+escapeAttr(s.contact||'')+'"></div>',
+        buttons:{confirm:function(){
+            var data={
+                status:'approved',
+                title:$('#sub-title').val().trim(),
+                url:$('#sub-url').val().trim(),
+                icon:$('#sub-icon').val().trim(),
+                category_id:parseInt($('#sub-category').val())||0,
+                description:$('#sub-desc').val(),
+                contact:$('#sub-contact').val(),
+                admin_note:''
+            };
+            if(!data.url){$.alert({title:'提示',type:'orange',content:'请输入 URL'});return false}
+            AjaxPostJson('/api/admin/submissions/'+id,data,function(){},function(d){
+                $.alert({title:'成功',type:'green',content:'已通过并生成网站'});loadSubmissions();
+            },function(e){AjaxError(e);});
+        },cancel:function(){}}});
+    });
+}
+// 仅编辑：保存信息并保持待审核
+function editSub(id){
+    loadSubDetail(id,function(s){
+        var catOptions=buildCategoryOptions(s.category_id);
+        $.confirm({title:'编辑投稿',content:
+            '<div class="form-group"><label>标题</label><input class="form-control" id="sub-title" value="'+escapeAttr(s.title||'')+'"></div>'+
+            '<div class="form-group"><label>URL</label><input class="form-control" id="sub-url" value="'+escapeAttr(s.url)+'"></div>'+
+            '<div class="form-group"><label>Logo URL / Base64</label><input class="form-control" id="sub-icon" value="'+escapeAttr(s.icon||'')+'"></div>'+
+            '<div class="form-group"><label>分类</label><select class="form-control" id="sub-category">'+catOptions+'</select></div>'+
+            '<div class="form-group"><label>描述</label><textarea class="form-control" id="sub-desc" rows="3">'+escapeHtml(s.description||'')+'</textarea></div>'+
+            '<div class="form-group"><label>联系方式</label><input class="form-control" id="sub-contact" value="'+escapeAttr(s.contact||'')+'"></div>',
+        buttons:{confirm:function(){
+            var data={
+                status:s.status||'pending',
+                title:$('#sub-title').val().trim(),
+                url:$('#sub-url').val().trim(),
+                icon:$('#sub-icon').val().trim(),
+                category_id:parseInt($('#sub-category').val())||0,
+                description:$('#sub-desc').val(),
+                contact:$('#sub-contact').val(),
+                admin_note:s.admin_note||''
+            };
+            AjaxPostJson('/api/admin/submissions/'+id,data,function(){},function(d){
+                $.alert({title:'成功',type:'green',content:'已保存'});loadSubmissions();
+            },function(e){AjaxError(e);});
+        },cancel:function(){}}});
+    });
+}
+function rejectSub(id){
+    var note=prompt('拒绝原因（可选）:')||'';
+    AjaxPostJson('/api/admin/submissions/'+id,{status:'rejected',admin_note:note},function(){},function(d){
+        $.alert({title:'成功',type:'green',content:'已拒绝'});loadSubmissions();
     },function(e){AjaxError(e);});
 }
+// 从当前列表页数据中取详情（避免额外请求）
+function loadSubDetail(id,cb){
+    AjaxForm('GET','/api/admin/submissions?page=1&page_size=100','',function(){},function(d){
+        var item=null;
+        (d.list||[]).forEach(function(x){ if(String(x.id)===String(id)) item=x; });
+        if(item) cb(item);
+        else $.alert({title:'提示',type:'orange',content:'未找到该投稿'});
+    },function(e){AjaxError(e);});
+}
+function buildCategoryOptions(selected){
+    var html='';
+    html+='<option value="">未选择</option>';
+    var flat=[];
+    // 先加载分类树（前端缓存）
+    if(window.__catFlat){ flat=window.__catFlat; }
+    var render=function(){ flat.forEach(function(c){
+        var sel=c.id===selected?' selected':'';
+        var label=(c.level===2?'&nbsp;&nbsp;├ ':'')+escapeHtml(c.name);
+        html+='<option value="'+c.id+'"'+sel+'>'+label+'</option>';
+    }); };
+    if(!window.__catFlat){
+        AjaxForm('GET','/api/admin/category','',function(){},function(d){
+            var list=d.list||[];
+            window.__catFlat=[];
+            list.forEach(function(c){ window.__catFlat.push({id:c.id,name:c.name,level:c.level}); });
+            flat=window.__catFlat; render(); $('#sub-category').html(html);
+        },function(e){});
+    }
+    return html;
+}
+function escapeHtml(t){if(!t)return'';return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function escapeAttr(t){if(!t)return'';return escapeHtml(t).replace(/"/g,'&quot;');}
 function renderPagination(p){if(!p)return;var total=Math.ceil(p.total/p.per_page_count);var html='';for(var i=1;i<=total;i++)html+='<li class="page-item'+(i===p.current_page?' active':'')+'"><a class="page-link" href="javascript:void(0)" onclick="page='+i+';loadSubmissions()">'+i+'</a></li>';$('#pagination').html(html);}
 $(function(){loadSubmissions();});
 </script>

@@ -190,41 +190,44 @@ func NewHTTPServer(
 			// === Extended admin endpoints ===
 			// Review moderation
 			strictAuthRouter.GET("/reviews", adminExtH.ReviewList)
-			strictAuthRouter.PUT("/reviews/:id", adminExtH.ReviewUpdate)
+			strictAuthRouter.POST("/reviews/:id", adminExtH.ReviewUpdate)
 			// Rating management
 			strictAuthRouter.GET("/ratings", adminExtH.RatingList)
 			strictAuthRouter.DELETE("/ratings/:id", adminExtH.RatingDelete)
-			strictAuthRouter.PUT("/ratings/:id", adminExtH.RatingUpdate)
+			strictAuthRouter.POST("/ratings/:id", adminExtH.RatingUpdate)
 			// User management
 			strictAuthRouter.GET("/users", adminExtH.UserList)
-			strictAuthRouter.PUT("/users/:id", adminExtH.UserUpdate)
+			strictAuthRouter.POST("/users", adminExtH.UserCreate)
+			strictAuthRouter.POST("/users/:id", adminExtH.UserUpdate)
 			// Model dictionary
 			strictAuthRouter.GET("/models", adminExtH.ModelList)
 			strictAuthRouter.POST("/models", adminExtH.ModelCreate)
-			strictAuthRouter.PUT("/models/:id", adminExtH.ModelUpdate)
+			strictAuthRouter.POST("/models/:id", adminExtH.ModelUpdate)
 			strictAuthRouter.DELETE("/models/:id", adminExtH.ModelDelete)
 			// Tag dictionary
 			strictAuthRouter.GET("/tags", adminExtH.TagList)
 			strictAuthRouter.POST("/tags", adminExtH.TagCreate)
-			strictAuthRouter.PUT("/tags/:id", adminExtH.TagUpdate)
+			strictAuthRouter.POST("/tags/:id", adminExtH.TagUpdate)
 			strictAuthRouter.DELETE("/tags/:id", adminExtH.TagDelete)
 			// Payment method dictionary
 			strictAuthRouter.GET("/payment-methods", adminExtH.PaymentMethodList)
 			strictAuthRouter.POST("/payment-methods", adminExtH.PaymentMethodCreate)
-			strictAuthRouter.PUT("/payment-methods/:id", adminExtH.PaymentMethodUpdate)
+			strictAuthRouter.POST("/payment-methods/:id", adminExtH.PaymentMethodUpdate)
 			strictAuthRouter.DELETE("/payment-methods/:id", adminExtH.PaymentMethodDelete)
 			// Submission management
 			strictAuthRouter.GET("/submissions", adminExtH.SubmissionList)
-			strictAuthRouter.PUT("/submissions/:id", adminExtH.SubmissionUpdate)
+			strictAuthRouter.POST("/submissions/:id", adminExtH.SubmissionUpdate)
 			// Site settings (lang, anonymous, submission toggle)
-			strictAuthRouter.PUT("/site-settings", adminExtH.UpdateSiteSettings)
+			strictAuthRouter.GET("/site-settings", adminExtH.GetSiteSettings)
+			strictAuthRouter.POST("/site-settings", adminExtH.UpdateSiteSettings)
 			// Health check config
 			strictAuthRouter.GET("/health-config", adminExtH.GetHealthConfig)
-			strictAuthRouter.PUT("/health-config", adminExtH.UpdateHealthConfig)
+			strictAuthRouter.POST("/health-config", adminExtH.UpdateHealthConfig)
 			strictAuthRouter.POST("/health-trigger", adminExtH.TriggerHealthCheck)
 			// Homepage layout config
 			strictAuthRouter.GET("/homepage-config", adminExtH.GetHomepageConfig)
 			strictAuthRouter.PUT("/homepage-config", adminExtH.UpdateHomepageConfig)
+			strictAuthRouter.POST("/homepage-config", adminExtH.UpdateHomepageConfig)
 			// SEO config
 			strictAuthRouter.GET("/seo-config", adminExtH.GetSEOConfig)
 			strictAuthRouter.POST("/seo-config", adminExtH.UpdateSEOConfig)
@@ -237,6 +240,7 @@ func NewHTTPServer(
 			strictAuthRouter.POST("/ads", adminExtH.AdCreate)
 			strictAuthRouter.PUT("/ads/:id", adminExtH.AdUpdate)
 			strictAuthRouter.DELETE("/ads/:id", adminExtH.AdDelete)
+			strictAuthRouter.GET("/ad-slots", adminExtH.AdSlots)
 		}
 	}
 

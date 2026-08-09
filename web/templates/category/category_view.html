@@ -366,6 +366,7 @@
                         if (data.pid === 0) {
                             data.pid = 0
                         }
+                        // 修复: 编辑时 disabled 状态与切换
                         $('#level').selectpicker('val', data.pid);
                         $("#level").selectpicker('refresh');
                         $("#level").attr("disabled", "");
@@ -374,6 +375,12 @@
                         $("#icon").val(data.icon);
                         $("#link").val(data.link);
                         $("#sortId").val(data.sort_id);
+                        // 根据启用状态同步单选按钮
+                        if (data.is_used) {
+                            $("#statusTwo").prop('checked', true);
+                        } else {
+                            $("#statusOne").prop('checked', true);
+                        }
                     }
                 },
                 function (response) {

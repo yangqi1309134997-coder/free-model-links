@@ -6,7 +6,7 @@ const TableNameStRating = "st_rating"
 
 type StRating struct {
 	ID        int        `gorm:"column:id;type:INTEGER;primaryKey" json:"id"`
-	SiteID    int        `gorm:"column:site_id;type:int(11);not null;index" json:"site_id"`
+	SiteID    int        `gorm:"column:site_id;type:int(11);not null;uniqueIndex:idx_site_visitor" json:"site_id"`
 	UserID    int        `gorm:"column:user_id;type:int(11);not null;default:0;index" json:"user_id"`
 	VisitorID string     `gorm:"column:visitor_id;type:varchar(100);default:'';uniqueIndex:idx_site_visitor" json:"visitor_id"`
 	Score     int        `gorm:"column:score;type:int(11);not null" json:"score"`

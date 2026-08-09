@@ -57,12 +57,21 @@ function showAdd(){
     },cancel:function(){}}});
 }
 function editTag(id){
-    $.confirm({title:'编辑标签',content:'<div class="form-group"><label>名称</label><input class="form-control" id="t-name" required></div><div class="form-group"><label>颜色</label><input class="form-control" id="t-color" type="color"></div><div class="form-group"><label>排序</label><input class="form-control" id="t-sort" type="number"></div>',
+    // 查找当前行的名称/颜色/排序进行预填
+    var row=null;
+    $('.tbody tr').each(function(){
+        if($(this).find('td').eq(0).text()===String(id)){ row=$(this); }
+    });
+    var name=row?row.find('td').eq(1).text().trim():'';
+    var color=row?row.find('td').eq(2).text().trim():'#10b981';
+    var sort=row?row.find('td').eq(3).text().trim():'0';
+    $.confirm({title:'编辑标签',content:'<div class="form-group"><label>名称</label><input class="form-control" id="t-name" value="'+escapeAttr(name)+'" required></div><div class="form-group"><label>颜色</label><input class="form-control" id="t-color" type="color" value="'+escapeAttr(color)+'"></div><div class="form-group"><label>排序</label><input class="form-control" id="t-sort" type="number" value="'+escapeAttr(sort)+'"></div>',
     buttons:{confirm:function(){
         var data={name:$('#t-name').val(),color:$('#t-color').val(),sort:parseInt($('#t-sort').val())||0};
         AjaxPostJson('/api/admin/tags/'+id,data,function(){},function(d){$.alert({title:'成功',type:'green',content:'已更新'});loadTags();},function(e){AjaxError(e);});
     },cancel:function(){}}});
 }
+function escapeAttr(t){if(!t)return'';return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function deleteTag(id){
     $.confirm({title:'确认',content:'确定删除?',type:'red',buttons:{confirm:function(){
         AjaxForm('DELETE','/api/admin/tags/'+id,'',function(){},function(d){$.alert({title:'成功',type:'green',content:'已删除'});loadTags();},function(e){AjaxError(e);});

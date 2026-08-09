@@ -98,16 +98,7 @@ func NewDB(conf *viper.Viper, l *log.Logger) *gorm.DB {
 func autoMigrateAndInitialize(db *gorm.DB) {
 	ctx := context.Background()
 
-	err := db.Migrator().DropTable(
-		&model.SysUserMenu{},
-		&model.SysMenu{},
-	)
-	if err != nil {
-		fmt.Println("migrate drop table error")
-		os.Exit(0)
-	}
-
-	err = db.AutoMigrate(
+	err := db.AutoMigrate(
 		&model.SysConfig{},
 		&model.SysUser{},
 		&model.SysUserMenu{},
@@ -122,6 +113,8 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 		&model.StRating{},
 		&model.StReview{},
 		&model.StSubmission{},
+		&model.StSubmissionTag{},
+		&model.StSubmissionPayment{},
 		&model.StAd{},
 	)
 	if err != nil {
@@ -147,14 +140,60 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 		os.Exit(0)
 	}
 
-	if err = query.SysMenu.WithContext(ctx).Create(DefaultSysMenuAdmin...); err != nil {
+	if _, err = query.SysMenu.WithContext(ctx).
+		Where(query.SysMenu.ID.In(menuIDs(DefaultSysMenuAdmin)...)).
+		Attrs(
+			field.Attrs(&model.SysMenu{
+				Pid:    0,
+				Name:   "菜单",
+				IsUsed: true,
+			}),
+		).
+		FirstOrCreate(); err != nil {
 		fmt.Println("menu migrate error")
 		os.Exit(0)
 	}
+	for _, menu := range DefaultSysMenuAdmin {
+		count, err := query.SysMenu.WithContext(ctx).Where(query.SysMenu.ID.Eq(menu.ID)).Count()
+		if err != nil {
+			fmt.Println("menu migrate error")
+			os.Exit(0)
+		}
+		if count == 0 {
+			if err := query.SysMenu.WithContext(ctx).Create(menu); err != nil {
+				fmt.Println("menu migrate error")
+				os.Exit(0)
+			}
+		}
+	}
 
-	if err = query.SysUserMenu.WithContext(ctx).Create(DefaultSysUserMenuAdmin...); err != nil {
+	if _, err = query.SysUserMenu.WithContext(ctx).
+		Where(query.SysUserMenu.MenuID.In(menuIDs(DefaultSysMenuAdmin)...), query.SysUserMenu.UserID.Eq(1)).
+		Attrs(
+			field.Attrs(&model.SysUserMenu{
+				UserID: 1,
+			}),
+		).
+		FirstOrCreate(); err != nil {
 		fmt.Println("user menu migrate error")
 		os.Exit(0)
+	}
+	existingUserMenus, err := query.SysUserMenu.WithContext(ctx).Where(query.SysUserMenu.UserID.Eq(1)).Find()
+	if err != nil {
+		fmt.Println("user menu migrate error")
+		os.Exit(0)
+	}
+	have := make(map[int]bool, len(existingUserMenus))
+	for _, um := range existingUserMenus {
+		have[um.MenuID] = true
+	}
+	for _, menu := range DefaultSysMenuAdmin {
+		if !have[menu.ID] {
+			if err := query.SysUserMenu.WithContext(ctx).Create(&model.SysUserMenu{UserID: 1, MenuID: menu.ID}); err != nil {
+				fmt.Println("user menu migrate error")
+				os.Exit(0)
+			}
+		}
 	}
 
 	_, err = query.SysConfig.WithContext(ctx).
@@ -179,5 +218,103 @@ func autoMigrateAndInitialize(db *gorm.DB) {
 		os.Exit(0)
 	}
 
+	// 兼容旧库：若此前从未有过评分/评论数据且匿名开关被默认关闭，
+	// 则自动开启匿名评分与匿名评论，保证前台功能开箱即用
+	migrateAnonymousFlags(db)
+
+	// 内置一套完整的 AI 大模型导航默认分类
+	seedDefaultCategories(db)
+	// 内置覆盖主流大模型的模型字典
+	seedDefaultModels(db)
+
 	fmt.Println("success initialize")
+}
+
+// migrateAnonymousFlags 处理历史数据库：默认关闭的匿名开关在无任何历史评分/评论数据时自动打开
+func migrateAnonymousFlags(db *gorm.DB) {
+	var config model.SysConfig
+	if err := db.First(&config, 1).Error; err != nil {
+		return
+	}
+
+	if config.AllowAnonymousRating && config.AllowAnonymousReview {
+		return
+	}
+
+	var ratingCount int64
+	db.Model(&model.StRating{}).Count(&ratingCount)
+	var reviewCount int64
+	db.Model(&model.StReview{}).Count(&reviewCount)
+	if ratingCount == 0 && reviewCount == 0 {
+		updates := map[string]interface{}{}
+		if !config.AllowAnonymousRating {
+			updates["allow_anonymous_rating"] = true
+		}
+		if !config.AllowAnonymousReview {
+			updates["allow_anonymous_review"] = true
+		}
+		if len(updates) > 0 {
+			db.Model(&model.SysConfig{}).Where("id = ?", 1).Updates(updates)
+		}
+	}
+}
+
+// menuIDs 提取默认菜单 ID 列表
+func menuIDs(menus []*model.SysMenu) []int {
+	ids := make([]int, 0, len(menus))
+	for _, m := range menus {
+		ids = append(ids, m.ID)
+	}
+	return ids
+}
+
+// seedDefaultCategories 仅在分类表为空时，内置一套完整的 AI 大模型导航默认分类
+func seedDefaultCategories(db *gorm.DB) {
+	var count int64
+	db.Model(&model.StCategory{}).Count(&count)
+	if count > 0 {
+		return
+	}
+
+	now := time.Now()
+	create := func(id, parentID int, title, icon string, sort int, level int32) model.StCategory {
+		return model.StCategory{
+			ID:        id,
+			ParentID:  parentID,
+			Title:     title,
+			Icon:      icon,
+			Sort:      sort,
+			Level:     level,
+			IsUsed:    true,
+			CreatedAt: &now,
+			UpdatedAt: &now,
+		}
+	}
+
+	categories := []model.StCategory{
+		// 一级分类：官方模型平台
+		create(1, 0, "官方模型平台", "linecons-star", 1, 1),
+		create(2, 1, "国产大模型官方", "linecons-lightbulb", 10, 2),
+		create(3, 1, "国外大模型官方", "linecons-globe", 20, 2),
+		// 一级分类：中转 API 服务商
+		create(4, 0, "中转 API 服务商", "linecons-cloud", 2, 1),
+		create(5, 4, "大厂中转站", "linecons-diamond", 10, 2),
+		create(6, 4, "普通中转站", "linecons-shop", 20, 2),
+		create(7, 4, "国内外全系中转", "linecons-cup", 30, 2),
+		// 一级分类：公益与免费
+		create(8, 0, "公益与免费", "linecons-heart", 3, 1),
+		create(9, 8, "纯公益网站", "linecons-fire", 10, 2),
+		create(10, 8, "免费额度网站", "linecons-money", 20, 2),
+		// 一级分类：模型工具
+		create(11, 0, "模型工具", "linecons-cog", 4, 1),
+		create(12, 11, "模型聚合平台", "linecons-database", 10, 2),
+		create(13, 11, "模型评测与对比", "linecons-search", 20, 2),
+		create(14, 11, "开发工具与社区", "linecons-comment", 30, 2),
+	}
+
+	if err := db.Create(&categories).Error; err != nil {
+		fmt.Println("seed default categories error")
+		return
+	}
+	fmt.Println("success seed default categories")
 }

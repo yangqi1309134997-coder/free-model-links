@@ -21,8 +21,8 @@ type SysConfig struct {
 	SiteURL     string `gorm:"column:site_url;type:varchar(500)" json:"site_url"`
 	SiteLang              string `gorm:"column:site_lang;type:varchar(10);default:'zh'" json:"site_lang"`
 	DefaultSort           string `gorm:"column:default_sort;type:varchar(20);default:'sort'" json:"default_sort"`
-	AllowAnonymousRating  bool   `gorm:"column:allow_anonymous_rating;type:bool;default:false" json:"allow_anonymous_rating"`
-	AllowAnonymousReview  bool   `gorm:"column:allow_anonymous_review;type:bool;default:false" json:"allow_anonymous_review"`
+	AllowAnonymousRating  bool   `gorm:"column:allow_anonymous_rating;type:bool;default:true" json:"allow_anonymous_rating"`
+	AllowAnonymousReview  bool   `gorm:"column:allow_anonymous_review;type:bool;default:true" json:"allow_anonymous_review"`
 	AllowSubmission       bool   `gorm:"column:allow_submission;type:bool;default:true" json:"allow_submission"`
 	HealthCheckInterval   int    `gorm:"column:health_check_interval;type:int(11);default:30" json:"health_check_interval"`
 	HealthCheckMaxFails   int    `gorm:"column:health_check_max_fails;type:int(11);default:10" json:"health_check_max_fails"`
@@ -38,6 +38,11 @@ type SysConfig struct {
 	SeoTwitterCard  string `gorm:"column:seo_twitter_card;type:varchar(50)" json:"seo_twitter_card"`
 	SeoCanonicalURL string `gorm:"column:seo_canonical_url;type:varchar(500)" json:"seo_canonical_url"`
 	SeoRobots       string `gorm:"column:seo_robots;type:varchar(100);default:'index,follow'" json:"seo_robots"`
+	// 首页布局
+	ShowSearch      bool `gorm:"column:show_search;type:bool;default:true" json:"show_search"`
+	ShowHero        bool `gorm:"column:show_hero;type:bool;default:true" json:"show_hero"`
+	ShowCategoryNav bool `gorm:"column:show_category_nav;type:bool;default:true" json:"show_category_nav"`
+	ShowFooter      bool `gorm:"column:show_footer;type:bool;default:true" json:"show_footer"`
 	// 友情链接（JSON 数组）
 	FriendLinks string `gorm:"column:friend_links;type:text" json:"friend_links"`
 	// 网站版权信息

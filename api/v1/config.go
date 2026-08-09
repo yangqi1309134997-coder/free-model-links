@@ -20,6 +20,12 @@ type ConfigResp struct {
 	SiteLogo      string `json:"site_logo"`       // 网站Logo URL
 	SiteFavicon   string `json:"site_favicon"`    // 网站Favicon URL
 	SiteCopyright string `json:"site_copyright"`  // 网站版权信息
+	// SEO 扩展
+	SeoAuthor       string `json:"seo_author"`        // 网站作者
+	SeoOgImage      string `json:"seo_og_image"`      // OG/Twitter 分享图
+	SeoTwitterCard  string `json:"seo_twitter_card"`  // Twitter Card 类型
+	SeoCanonicalURL string `json:"seo_canonical_url"` // 规范链接
+	SeoRobots       string `json:"seo_robots"`        // Robots 指令
 }
 
 type (
@@ -35,6 +41,12 @@ type (
 		SiteCopyright *string               `json:"site_copyright" form:"site_copyright"` // 网站版权信息
 		LogoFile      *multipart.FileHeader `json:"logo" form:"logo"`                 // 上传 logo 图片
 		FaviconFile   *multipart.FileHeader `json:"favicon" form:"favicon"`           // 上传 favicon 图片
+		// SEO 扩展
+		SeoAuthor       *string `json:"seo_author" form:"seo_author"`
+		SeoOgImage      *string `json:"seo_og_image" form:"seo_og_image"`
+		SeoTwitterCard  *string `json:"seo_twitter_card" form:"seo_twitter_card"`
+		SeoCanonicalURL *string `json:"seo_canonical_url" form:"seo_canonical_url"`
+		SeoRobots       *string `json:"seo_robots" form:"seo_robots"`
 	}
 
 	ConfigUpdateResp struct {

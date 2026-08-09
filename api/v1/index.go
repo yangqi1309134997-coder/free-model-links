@@ -45,6 +45,14 @@ type ConfigSite struct {
 	AllowAnonymousRating  bool `json:"allow_anonymous_rating"`
 	AllowAnonymousReview  bool `json:"allow_anonymous_review"`
 	AllowSubmission       bool `json:"allow_submission"`
+	// 首页布局
+	CardsPerRow     int  `json:"cards_per_row"`
+	ShowFeatured    bool `json:"show_featured"`
+	ShowRecommended bool `json:"show_recommended"`
+	ShowSearch      bool `json:"show_search"`
+	ShowHero        bool `json:"show_hero"`
+	ShowCategoryNav bool `json:"show_category_nav"`
+	ShowFooter      bool `json:"show_footer"`
 	// SEO 扩展
 	SeoAuthor       string       `json:"seo_author"`
 	SeoOgImage      string       `json:"seo_og_image"`
@@ -56,11 +64,13 @@ type ConfigSite struct {
 }
 
 type IndexResp struct {
-	About         *About
-	ConfigSite    *ConfigSite
-	CategoryTree  []*TreeNode
-	CategorySites []*CategorySite
-	Lang          map[string]string
+	About            *About
+	ConfigSite       *ConfigSite
+	CategoryTree     []*TreeNode
+	CategorySites    []*CategorySite
+	FeaturedSites    []model.StSite
+	RecommendedSites []model.StSite
+	Lang             map[string]string
 }
 
 type AboutResp struct {

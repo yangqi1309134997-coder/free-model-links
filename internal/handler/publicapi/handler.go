@@ -2,7 +2,6 @@ package publicapi
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -14,6 +13,7 @@ import (
 	v1 "github.com/ch3nnn/webstack-go/api/v1"
 	"github.com/ch3nnn/webstack-go/internal/dal/model"
 	"github.com/ch3nnn/webstack-go/pkg/log"
+	"github.com/ch3nnn/webstack-go/pkg/tools"
 )
 
 type Handler struct {
@@ -49,7 +49,7 @@ func (h *Handler) SiteList(ctx *gin.Context) {
 		query = query.Where("id IN (SELECT site_id FROM st_site_tag WHERE tag_id = ?)", req.TagID)
 	}
 	if req.ModelID > 0 {
-		query = query.Where("supported_models LIKE ?", fmt.Sprintf("%%%d%%", req.ModelID))
+		query = query.Where("id IN (SELECT site_id FROM st_site WHERE supported_models LIKE ?)", "%"+strconv.Itoa(req.ModelID)+"%")
 	}
 
 	var total int64
@@ -360,7 +360,7 @@ func (h *Handler) ReviewList(ctx *gin.Context) {
 
 func (h *Handler) ModelList(ctx *gin.Context) {
 	var models []model.StModel
-	h.db.Where("is_used = ?", true).Order("sort ASC").Find(&models)
+	h.db.Where("is_used = ? AND deleted_at IS NULL", true).Order("sort ASC").Find(&models)
 
 	list := make([]v1.ModelItem, 0, len(models))
 	for _, m := range models {
@@ -373,7 +373,7 @@ func (h *Handler) ModelList(ctx *gin.Context) {
 
 func (h *Handler) TagList(ctx *gin.Context) {
 	var tags []model.StTag
-	h.db.Where("is_used = ?", true).Order("sort ASC").Find(&tags)
+	h.db.Where("is_used = ? AND deleted_at IS NULL", true).Order("sort ASC").Find(&tags)
 
 	list := make([]v1.SiteTagInfo, 0, len(tags))
 	for _, t := range tags {
@@ -396,6 +396,8 @@ func (h *Handler) SubmitSite(ctx *gin.Context) {
 		Description string `json:"description"`
 		CategoryID  int    `json:"category_id"`
 		Contact     string `json:"contact"`
+		Icon        string `json:"icon"`
+		ModelIDs    string `json:"model_ids"`
 	}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
@@ -410,9 +412,21 @@ func (h *Handler) SubmitSite(ctx *gin.Context) {
 		Description: req.Description,
 		CategoryID:  req.CategoryID,
 		Contact:     req.Contact,
+		ModelIDs:    req.ModelIDs,
 		Status:      "pending",
 		CreatedAt:   &now,
 		UpdatedAt:   &now,
+	}
+
+	if req.Icon != "" {
+		if len(req.Icon) > 20 && req.Icon[:20] == "data:image/png;base64," {
+			sub.Icon = req.Icon[22:]
+		} else {
+			icon, err := tools.ResizeURLImgToBase64(req.Icon, 64, 64)
+			if err == nil && icon != "" {
+				sub.Icon = icon
+			}
+		}
 	}
 
 	if err := h.db.Create(&sub).Error; err != nil {
@@ -439,7 +453,7 @@ func (h *Handler) GetSiteConfig(ctx *gin.Context) {
 
 func (h *Handler) getCategoryMap() map[int]string {
 	var cats []model.StCategory
-	h.db.Find(&cats)
+	h.db.Where("deleted_at IS NULL").Find(&cats)
 	m := make(map[int]string)
 	for _, c := range cats {
 		m[c.ID] = c.Title

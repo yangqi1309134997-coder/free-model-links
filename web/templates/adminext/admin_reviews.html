@@ -66,8 +66,8 @@ function loadReviews() {
         (d.list||[]).forEach(function(r) {
             var badge = r.status==='approved'?'badge-success':r.status==='rejected'?'badge-danger':'badge-warning';
             var statusText = r.status==='approved'?'已通过':r.status==='rejected'?'已拒绝':'待审核';
-            html += '<tr><td>'+r.id+'</td><td>'+r.site_title+'</td><td>'+r.nickname+'</td><td>'+r.content+'</td>';
-            html += '<td><span class="badge '+badge+'">'+statusText+'</span></td><td>'+(r.admin_note||'')+'</td><td>'+r.created_at+'</td>';
+            html += '<tr><td>'+r.id+'</td><td>'+escapeHtml(r.site_title)+'</td><td>'+escapeHtml(r.nickname)+'</td><td>'+escapeHtml(r.content)+'</td>';
+            html += '<td><span class="badge '+badge+'">'+statusText+'</span></td><td>'+escapeHtml(r.admin_note||'')+'</td><td>'+escapeHtml(r.created_at)+'</td>';
             html += '<td style="text-align:center">';
             if (r.status !== 'approved') html += '<button class="btn btn-sm btn-success m-r-5" onclick="updateReview('+r.id+',\'approved\')">通过</button>';
             if (r.status !== 'rejected') html += '<button class="btn btn-sm btn-danger" onclick="updateReview('+r.id+',\'rejected\')">拒绝</button>';
@@ -77,6 +77,7 @@ function loadReviews() {
         renderPagination(d.pagination);
     }, function(e){ AjaxError(e); });
 }
+function escapeHtml(t){if(!t)return'';return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function updateReview(id, status) {
     var note = '';
     if (status === 'rejected') note = prompt('拒绝原因（可选）:') || '';

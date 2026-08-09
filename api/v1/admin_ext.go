@@ -184,6 +184,10 @@ type (
 		CardsPerRow      int               `json:"cards_per_row"`
 		ShowFeatured     bool              `json:"show_featured"`
 		ShowRecommended  bool              `json:"show_recommended"`
+		ShowSearch       bool              `json:"show_search"`
+		ShowHero         bool              `json:"show_hero"`
+		ShowCategoryNav  bool              `json:"show_category_nav"`
+		ShowFooter       bool              `json:"show_footer"`
 		FeaturedSiteIDs  []int             `json:"featured_site_ids"`
 	}
 
@@ -200,6 +204,10 @@ type (
 		CardsPerRow      *int              `json:"cards_per_row"`
 		ShowFeatured     *bool             `json:"show_featured"`
 		ShowRecommended  *bool             `json:"show_recommended"`
+		ShowSearch       *bool             `json:"show_search"`
+		ShowHero         *bool             `json:"show_hero"`
+		ShowCategoryNav  *bool             `json:"show_category_nav"`
+		ShowFooter       *bool             `json:"show_footer"`
 		FeaturedSiteIDs  []int             `json:"featured_site_ids"`
 	}
 )
