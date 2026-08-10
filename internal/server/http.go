@@ -151,6 +151,7 @@ func NewHTTPServer(
 			pub.GET("/sites", publicH.SiteList)
 			pub.GET("/sites/:id", publicH.SiteDetail)
 			pub.GET("/sites/:id/reviews", publicH.ReviewList)
+			pub.GET("/categories", publicH.CategoryTree)
 			pub.GET("/models", publicH.ModelList)
 			pub.GET("/tags", publicH.TagList)
 			pub.GET("/site-config", publicH.GetSiteConfig)

@@ -58,21 +58,34 @@
     </nav>
     <div class="nav-actions">
         <a href="https://api.iamhc.cn" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="background:var(--accent);color:#fff;">公益API</a>
-        <a href="https://github.com/yangqi1309134997-coder/free-model-links" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" title="项目开源地址">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-            开源
-        </a>
-        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        </button>
-        {{ if .About.IsAbout }}
-        <a href="/about" class="btn btn-ghost btn-sm">{{ index .Lang "about" }}</a>
-        {{ end }}
         {{ if .ConfigSite.AllowSubmission }}
         <a href="/submit" class="btn btn-secondary btn-sm">{{ index .Lang "submit_site" }}</a>
         {{ end }}
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </button>
+        {{ if .ConfigSite.ShowCategoryNav }}
+        <button class="btn btn-secondary btn-sm btn-menu" onclick="toggleDrawer()" aria-label="菜单">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        {{ end }}
     </div>
 </header>
+
+{{ if .ConfigSite.ShowCategoryNav }}
+<div class="nav-backdrop" id="nav-backdrop" onclick="closeDrawer()"></div>
+<nav class="nav-drawer" id="nav-drawer">
+    <div class="drawer-head">
+        <span>导航</span>
+        <button class="drawer-close" onclick="closeDrawer()" aria-label="关闭">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+    {{ range .CategoryTree }}
+    <a href="#cat-{{ .Name }}" onclick="closeDrawer()" class="smooth">{{ .Name }}</a>
+    {{ end }}
+</nav>
+{{ end }}
 
 {{ if .ConfigSite.ShowHero }}
 <section class="hero-section">
@@ -254,6 +267,8 @@ var LANG_DATA = {
 };
 function toggleTheme(){var h=document.documentElement,c=h.getAttribute('data-theme'),n=c==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n)}
 (function(){var s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark')})();
+function toggleDrawer(){var d=document.getElementById('nav-drawer'),b=document.getElementById('nav-backdrop');if(!d)return;var open=d.classList.contains('open');if(open){closeDrawer()}else{d.classList.add('open');if(b)b.classList.add('show');document.body.style.overflow='hidden'}}
+function closeDrawer(){var d=document.getElementById('nav-drawer'),b=document.getElementById('nav-backdrop');if(d)d.classList.remove('open');if(b)b.classList.remove('show');document.body.style.overflow=''}
 var si=document.getElementById('search-input');if(si){si.addEventListener('input',function(e){var q=e.target.value.toLowerCase();document.querySelectorAll('.site-card').forEach(function(c){var t=c.querySelector('.card-title').textContent.toLowerCase();var d=c.querySelector('.card-desc').textContent.toLowerCase();c.style.display=(t.includes(q)||d.includes(q))?'':'none'})})}document.querySelectorAll('a.smooth,a.filter-chip').forEach(function(a){a.addEventListener('click',function(e){var href=decodeURI(this.getAttribute('href'));var t=document.querySelector(href);if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}})});
 function sortSites(m){document.querySelectorAll('.card-grid').forEach(function(g){var c=Array.from(g.children);c.sort(function(a,b){var ra=parseFloat(a.dataset.rating)||0,rb=parseFloat(b.dataset.rating)||0,rva=parseInt(a.dataset.reviews)||0,rvb=parseInt(b.dataset.reviews)||0;switch(m){case'rating-desc':return rb-ra;case'rating-asc':return ra-rb;case'reviews-desc':return rvb-rva;default:return 0}});c.forEach(function(x){g.appendChild(x)})})}
 var total=document.querySelectorAll('.card-grid .site-card').length;document.getElementById('site-count').textContent=total+' '+LANG_DATA.api_providers_count;

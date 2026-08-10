@@ -320,15 +320,110 @@ body {
 .star-rating .star.filled { color: var(--star); }
 .star-rating .star:hover { color: var(--star); }
 
+/* ===== MOBILE SITE GRID =====
+   桌面端由模板内联 `repeat(CardsPerRow, minmax(0,1fr))` 控制列数；
+   平板/手机上强制一列并加大字号，避免 4 列挤成一排。 */
+@media (max-width: 768px) {
+  .card-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 14px; }
+  .site-card { padding: 18px 16px; }
+  .site-card .card-title { font-size: 17px; }
+  .site-card .card-desc { -webkit-line-clamp: 3; }
+  .site-card .card-icon { width: 44px; height: 44px; }
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .hero-section h1 { font-size: 28px; }
-  .hero-section p { font-size: 15px; }
-  .card-grid { grid-template-columns: 1fr; }
+  .hero-section h1 { font-size: 26px; }
+  .hero-section p { font-size: 14px; }
   .nav-header .nav-links { display: none; }
   .section-title { font-size: 18px; }
 }
 @media (max-width: 480px) {
-  .hero-section { padding-top: calc(var(--header-height) + 32px); }
-  .card-grid { padding: 0 16px; }
+  .hero-section { padding-top: calc(var(--header-height) + 28px); }
+  .card-grid { padding: 0 14px; }
+}
+
+/* ===== MOBILE HEADER ===== */
+@media (max-width: 768px) {
+  .nav-header { padding: 0 10px; }
+  .nav-header .logo { margin-right: 8px; }
+  .nav-header .logo img { max-height: 24px; }
+  .nav-actions { gap: 6px; }
+  .nav-actions .btn { padding: 6px 10px; font-size: 12px; }
+  .nav-actions .btn .btn-text { display: none; }
+  .nav-actions .btn-ghost { display: none; }
+  .theme-toggle { width: 32px; height: 32px; font-size: 14px; flex-shrink: 0; }
+}
+
+/* ===== MOBILE CATEGORY DRAWER ===== */
+.nav-drawer {
+  position: fixed; top: var(--header-height); right: 0; bottom: 0; z-index: 99;
+  width: min(280px, 78vw); background: var(--bg-card);
+  border-left: 0.5px solid var(--border);
+  box-shadow: var(--shadow-xl);
+  transform: translateX(100%);
+  transition: transform var(--transition-base);
+  padding: 16px 12px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.nav-drawer.open { transform: translateX(0); }
+.nav-drawer a {
+  display: block; padding: 12px 14px; border-radius: var(--radius-md);
+  color: var(--text-primary); text-decoration: none; font-size: 15px; font-weight: 500;
+  transition: background var(--transition-fast);
+}
+.nav-drawer a:hover, .nav-drawer a.active { background: var(--bg-card-hover); }
+.nav-drawer .drawer-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 6px 14px; border-bottom: 0.5px solid var(--border); margin-bottom: 8px;
+}
+.nav-drawer .drawer-head span { font-size: 13px; color: var(--text-tertiary); font-weight: 600; letter-spacing: 0.05em; }
+.nav-drawer .drawer-close {
+  width: 30px; height: 30px; border-radius: var(--radius-full); border: none;
+  background: var(--bg-input); color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-backdrop {
+  position: fixed; inset: var(--header-height) 0 0 0; z-index: 98;
+  background: rgba(0, 0, 0, 0.35); opacity: 0; pointer-events: none;
+  transition: opacity var(--transition-base);
+}
+.nav-backdrop.show { opacity: 1; pointer-events: auto; }
+
+/* 移动端菜单按钮（默认隐藏，仅 <768px 显示） */
+.btn-menu { display: none; }
+@media (max-width: 768px) {
+  .btn-menu { display: inline-flex; }
+}
+
+/* ===== MOBILE DETAIL PAGE ===== */
+@media (max-width: 768px) {
+  .detail-page { padding: calc(var(--header-height) + 20px) 14px 40px; }
+  .detail-header { flex-direction: column; gap: 14px; margin-bottom: 20px; }
+  .detail-title { font-size: 22px; }
+  .detail-actions { flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+  .detail-actions .btn { flex: 1; min-width: 120px; }
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab { padding: 10px 14px; white-space: nowrap; }
+  .health-bar { gap: 12px; flex-wrap: wrap; }
+  .rating-big { font-size: 38px; }
+  .rating-summary { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .pricing-table th, .pricing-table td { padding: 10px; font-size: 13px; }
+}
+
+/* ===== MOBILE SUBMIT PAGE ===== */
+@media (max-width: 480px) {
+  .auth-page { padding: 16px; align-items: flex-start; }
+  .auth-card { padding: 24px 18px; border-radius: var(--radius-lg); }
+  .auth-card h2 { font-size: 21px; }
+  .form-group label { font-size: 13px; }
+  .form-group input, .form-group textarea, .form-group select { font-size: 15px; }
+}
+
+/* ===== MOBILE AD SLOTS ===== */
+@media (max-width: 768px) {
+  #ad-homepage-top, #ad-homepage-bottom, #ad-site-detail-bottom, #ad-submit-sidebar {
+    padding-left: 14px; padding-right: 14px;
+  }
 }

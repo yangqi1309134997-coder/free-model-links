@@ -94,6 +94,17 @@ type (
 	}
 )
 
+// PublicCategory 前台公开分类（含子分类树）
+type PublicCategory struct {
+	ID       int              `json:"id"`
+	ParentID int              `json:"parent_id"`
+	Name     string           `json:"name"`
+	Icon     string           `json:"icon"`
+	Sort     int              `json:"sort"`
+	Level    int32            `json:"level"`
+	Children []PublicCategory `json:"children"`
+}
+
 type (
 	SubmitRatingReq struct {
 		Score int `json:"score" binding:"required,min=1,max=5"`

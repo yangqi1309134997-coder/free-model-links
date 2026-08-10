@@ -449,6 +449,29 @@ func (h *Handler) GetSiteConfig(ctx *gin.Context) {
 	})
 }
 
+// CategoryTree 返回启用的一级/二级分类树，供投稿页与前台导航使用
+func (h *Handler) CategoryTree(ctx *gin.Context) {
+	var cats []model.StCategory
+	h.db.Where("is_used = ? AND deleted_at IS NULL", true).Order("sort ASC, id ASC").Find(&cats)
+
+	children := make(map[int][]v1.PublicCategory)
+	var roots []v1.PublicCategory
+	for _, c := range cats {
+		item := v1.PublicCategory{ID: c.ID, ParentID: c.ParentID, Name: c.Title, Icon: c.Icon, Sort: c.Sort, Level: c.Level, Children: []v1.PublicCategory{}}
+		if c.ParentID > 0 {
+			children[c.ParentID] = append(children[c.ParentID], item)
+		} else {
+			roots = append(roots, item)
+		}
+	}
+	// 挂载二级分类
+	for i := range roots {
+		roots[i].Children = children[roots[i].ID]
+	}
+
+	v1.HandleSuccess(ctx, map[string]interface{}{"categories": roots})
+}
+
 // helpers
 
 func (h *Handler) getCategoryMap() map[int]string {

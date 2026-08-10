@@ -19,6 +19,15 @@
         .msg { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 16px; display: none; }
         .msg-error { background: #ff3b3010; color: var(--danger); border: 1px solid #ff3b3030; }
         .msg-success { background: #34c75910; color: var(--success); border: 1px solid #34c75930; }
+        /* 移动端投稿页（页面主体 min-height 100vh 会导致广告/返回链接被挤出首屏） */
+        @media (max-width: 480px) {
+            .auth-page { min-height: calc(100vh - 40px); padding: 20px 14px; align-items: flex-start; }
+            .auth-card { padding: 24px 18px; border-radius: var(--radius-lg); }
+            .auth-card h2 { font-size: 21px; }
+            .form-group label { font-size: 13px; }
+            .form-group input, .form-group textarea, .form-group select { font-size: 15px; }
+            #ad-submit-sidebar { margin-top: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -104,7 +113,6 @@ function loadCategories(){
     }).catch(function(){});
 }
 loadCategories();
-
 // 加载广告
 function loadAds(slot, containerId){
     fetch('/api/ads?slot='+slot).then(r=>r.json()).then(d=>{
