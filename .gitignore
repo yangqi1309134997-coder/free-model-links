@@ -5,3 +5,7 @@ storage/logs
 deploy/docker-compose/conf
 deploy/docker-compose/data
 sandbox-db/
+
+# 含密钥的本地配置，禁止入库（2026-10-12 JWT key 泄露事件后移除）
+config/prod.yml
+config/local.yml
